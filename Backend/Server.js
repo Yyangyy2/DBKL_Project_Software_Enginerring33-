@@ -4,6 +4,7 @@
     import bcrypt from 'bcrypt';//hash password
     import multer from 'multer'//handle multiple form content
     import cookieParser from 'cookie-parser';//httpOnly cookie
+    import axios from 'axios';
 
     //.env
     import dotenv from 'dotenv';
@@ -294,6 +295,66 @@
 
         });
     }); 
+
+
+
+
+
+   // Compare Faces endpoint
+app.post('/compareFaces', async (req, res) => {
+    const { capturedImage } = req.body; // The captured image data from the frontend in base64 format
+    const userId = req.user.id; // Assuming the user is authenticated
+
+    try {
+        // Retrieve the stored image for the user from MySQL
+        const query = 'SELECT images FROM users WHERE id = ?';
+        db.query(query, [userId], async (err, results) => {
+            if (err) {
+                return res.status(500).json({ message: 'Database error.', error: err });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'User image not found.' });
+            }
+
+            const storedImage = results[0].images;
+
+            try {
+                // Make a POST request to Face++ API
+                const facePlusPlusResponse = await axios.post(
+                    'https://api-us.faceplusplus.com/facepp/v3/compare',
+                    {
+                        api_key: process.env.FACE_API_KEY,
+                        api_secret: process.env.FACE_API_SECRET,
+                        image_base64_1: storedImage,
+                        image_base64_2: capturedImage,
+                    }
+                );
+
+                const { confidence } = facePlusPlusResponse.data;
+                if (confidence >= 70) { // Set confidence threshold for face match
+                    return res.json({ message: 'Faces match', confidence });
+                } else {
+                    return res.json({ message: 'Faces do not match', confidence });
+                }
+            } catch (apiError) {
+                console.error('Error in Face++ API call:', apiError);
+                return res.status(500).json({ message: 'Face++ API error', error: apiError.message });
+            }
+        });
+    } catch (error) {
+        console.error('Error comparing faces:', error);
+        return res.status(500).json({ message: 'Error comparing faces', error: error.message });
+    }
+});
+
+
+
+
+
+
+    
+
+
 
     // Start the server
     const PORT = 8081;

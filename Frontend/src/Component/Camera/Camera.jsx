@@ -1,9 +1,12 @@
+// CaptureImage.js
+
 import React, { useRef, useState, useEffect } from 'react';
 
 const CaptureImage = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [imageDataUrl, setImageDataUrl] = useState('');
+  const [comparisonResult, setComparisonResult] = useState(''); // State for comparison result
 
   useEffect(() => {
     // Request access to the camera when the component mounts
@@ -37,6 +40,24 @@ const CaptureImage = () => {
     console.log(dataUrl);
   };
 
+  // Function to send captured image to backend for comparison
+  const handleCompareFaces = async () => {
+    try {
+      const response = await fetch('http://localhost:8081/compareFaces', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ capturedImage: imageDataUrl }), // Send captured image
+      });
+      const result = await response.json();
+      setComparisonResult(result.message); // Set the comparison result message
+    } catch (error) {
+      console.error("Error comparing faces:", error);
+      setComparisonResult("Error comparing faces.");
+    }
+  };
+
   return (
     <div style={{ textAlign: 'center' }}>
       <h2>Capture Image from Camera</h2>
@@ -53,6 +74,15 @@ const CaptureImage = () => {
         <div>
           <h3>Captured Image:</h3>
           <img src={imageDataUrl} alt="Captured" style={{ maxWidth: '50%', width: '50%' }} />
+          <button onClick={handleCompareFaces}>Compare Faces</button> {/* New button for face comparison */}
+        </div>
+      )}
+
+      {/* Display the comparison result message */}
+      {comparisonResult && (
+        <div style={{ marginTop: '20px' }}>
+          <h3>Comparison Result:</h3>
+          <p>{comparisonResult}</p>
         </div>
       )}
     </div>
