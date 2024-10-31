@@ -140,6 +140,7 @@ function Homepage() {
     return (
         <div className={styles.Container}>
             <div className={styles.button}>
+              <div className={styles.center_container}>
                 {/* do not change this part */}
                 <button onClick={openDialog}>Upload Identity</button>
                 <dialog ref={dialogRef} className={styles.uploadIdentityDialog}>
@@ -184,6 +185,7 @@ function Homepage() {
                 {/* start from here */}
                 <button><Link to="/camera">Take Picture</Link></button>
                 <button><Link to="">Logout</Link></button>
+               </div>
             </div>
         </div>
     );
