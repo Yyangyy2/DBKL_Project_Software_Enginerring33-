@@ -454,9 +454,11 @@ app.post('/compareFaces', verifyToken, async (req, res) => {
                 return res.status(500).json({ message: 'Face++ API error', error: error_message });
             }
 
-            if (confidence >= 70) {
+            if(!confidence){
+                return res.status(200).json({ message: 'Faces do not match.' });
+            }else if (confidence >= 70) {
                 return res.json({ message: 'Faces match', confidence });
-            } else {
+            }else {
                 return res.json({ message: 'Faces do not match', confidence });
             }
 
