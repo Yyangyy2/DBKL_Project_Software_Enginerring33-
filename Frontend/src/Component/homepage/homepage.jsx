@@ -111,29 +111,31 @@ function Homepage() {
         }
     };
 
-    const uploadFile = async (file) =>{
-        const formData = new FormData(); // Corrected the casing of FormData
-        formData.append('file', file);//append file object to form data
-        formData.append('filename', file.name); // Add the filename to form data
-
-        try{
-            const response = await axios.post('http://localhost:8081/uploadImage', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',  
-                },
-                withCredentials: true // Ensure cookies, including the HTTP-only token, are sent
-            });
-
-            if(response.status === 200){
-                window.confirm(`${file.name} Upload Successful`)
-            }else{
-                alert(`${file.name} Uploaded Unsucessful, due to`, response.data);
+    const uploadFile = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file); // Append the file with key 'file'
+      
+        try {
+          const response = await axios.post(
+            'http://localhost:8081/uploadImage',
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+              withCredentials: true, // Include cookies
             }
-            
-        }catch(error){
-            alert(`Error Uploading File: ${error.message}`);
+          );
+      
+          if (response.status === 200) {
+            window.confirm(`${file.name} Upload Successful`);
+          } else {
+            alert(`${file.name} Uploaded Unsuccessful, due to`, response.data);
+          }
+        } catch (error) {
+          alert(`Error Uploading File: ${error.message}`);
         }
-    }
+      };
   
     return (
         <div className={styles.Container}>
