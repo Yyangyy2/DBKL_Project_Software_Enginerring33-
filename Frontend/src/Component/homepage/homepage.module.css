@@ -208,7 +208,7 @@ h3{
     background-color: transparent;
 }
 
-.btn{
+#btn{
     background: red;
     padding: 15px 20px;
     color: white;
@@ -220,7 +220,7 @@ h3{
     width: 100%;
 }
 
-.btn:hover{
+#btn:hover{
     background-color: rgba(255, 0, 0, .5);
     color: rgba(0, 0, 0, .5);
     font-weight: 700;

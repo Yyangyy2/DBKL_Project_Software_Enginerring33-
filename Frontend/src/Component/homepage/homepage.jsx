@@ -176,7 +176,7 @@ function Homepage() {
                             </div>
                         </div>
                         <div className={styles.bottom}>
-                            <button className={styles.btn} onClick={closeDialog}>Cancel</button>
+                            <button id={styles.btn} onClick={closeDialog}>Cancel</button>
                             <button className={styles.btn_primary} onClick={handleUpload}>Save</button>
                         </div>
                     </div>
