@@ -2,7 +2,7 @@
 import Login from '../../../dbkl/Frontend/src/Component/Admin login/admin_login'
 import Register from './Component/Admin register/admin_register'
 import Homepage from './Component/homepage/homepage';
-
+import Camera from './Component/Camera/Camera';
 
 //import React router dom
 import{
@@ -32,6 +32,11 @@ const router = createBrowserRouter([
   {
     path: '/homepage',
     element: <div><Homepage/></div>
+  },
+
+  {
+    path: '/camera',
+    element: <div><Camera/></div>
   },
 
 ])
