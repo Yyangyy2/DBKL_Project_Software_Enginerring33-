@@ -1,3 +1,4 @@
+
 import express from 'express';
 import mysql from 'mysql';
 import cors from 'cors';
@@ -266,7 +267,20 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// convert base 64 to image url 
+//logout
+app.post('/logout',(req, res) =>{
+        // Clear the JWT cookie by setting it to an expired date
+        console.log(req.body);
+        
+        res.clearCookie('token',{
+            httpOnly: true,// Ensures the cookie can't be accessed by JavaScript
+            secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
+            sameSite: 'strict', // SameSite policy to prevent CSRF attacks
+        });
+         // Send a response indicating the user is logged out
+        return res.json({ message: 'Logged out successfully' });
+});
+
 const uploadToImgBB = async (imageBase64) => {
     try {
         const form = new FormData();
@@ -292,6 +306,8 @@ const uploadToImgBB = async (imageBase64) => {
         return null;
     }
 };
+
+
 
 // Image Upload Endpoint
 app.post('/uploadImage', upload.single('file'), verifyToken, (req, res) => {
@@ -432,9 +448,9 @@ app.post('/compareFaces', verifyToken, async (req, res) => {
             }
 
             if(!confidence){
-                return res.status(200).json({ message: 'Faces not recognized.' });
+                return res.status(200).json({ message: 'Faces do not match.' });
             }
-            
+            // Compare confidence levels
             if (confidence >= 70) {
                 return res.json({ message: 'Faces match', confidence });
             }else {
@@ -447,6 +463,64 @@ app.post('/compareFaces', verifyToken, async (req, res) => {
         }
     });
 });
+
+app.post('/saveLocation', verifyToken, async (req, res) => {
+    const { capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude } = req.body;
+    const userId = req.user.id;
+
+    console.log('Endpoint reached'); // Test log
+
+    const query = `
+        INSERT INTO users (id, captured_latitude, captured_longitude, selected_latitude, selected_longitude)
+        VALUES (?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            captured_latitude = VALUES(captured_latitude),
+            captured_longitude = VALUES(captured_longitude),
+            selected_latitude = VALUES(selected_latitude),
+            selected_longitude = VALUES(selected_longitude)
+    `;
+
+    try {
+        await new Promise((resolve, reject) => {
+            db.query(query, [userId, capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude], (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+        res.status(200).send('Location saved successfully');
+    } catch (error) {
+        console.error('Error saving location:', error.message || error);
+        res.status(500).send('Error saving location');
+    }
+});
+
+// Endpoint to save status in the users table
+app.post('/saveStatus', verifyToken, async (req, res) => {
+    const { status } = req.body;
+    const userId = req.user.id;  // userId is obtained from the token
+
+    if (!status) {
+        return res.status(400).json({ message: 'Status is required' });
+    }
+
+    const query = `UPDATE users SET status = ? WHERE id = ?`;
+
+    try {
+        await new Promise((resolve, reject) => {
+            db.query(query, [status, userId], (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+
+        res.status(200).json({ message: 'Status updated successfully' });
+    } catch (error) {
+        console.error('Error updating status:', error.message || error);
+        res.status(500).json({ message: 'Error updating status' });
+    }
+});
+
+
 
 // Start the server
 const PORT = 8081;

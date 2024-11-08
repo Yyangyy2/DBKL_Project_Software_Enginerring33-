@@ -1,7 +1,7 @@
 import styles from './homepage.module.css';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useEffect } from 'react-router-dom';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState,  } from 'react';
 
 //icons
 import { LiaTimesSolid } from "react-icons/lia";
@@ -13,6 +13,7 @@ function Homepage() {
     const dialogRef = useRef(null);
     const [file, setFile] = useState(null); 
     const [token, setToken] = useState(null);
+    const navigate = useNavigate();
 
     const openDialog = () => {
         dialogRef.current.showModal();
@@ -134,13 +135,33 @@ function Homepage() {
             alert(`Error Uploading File: ${error.message}`);
         }
     }
+
+    //Handle logout
+    const logout = async ()=>{
+        try{
+            const response = await axios.post('http://localhost:8081/logout', {}, {
+                withCredentials: true // Send the request with cookies
+            });
+
+            if(response.status === 200){
+                alert('logout successful');
+                setToken(null);//clear the token
+                navigate('/login')//redirect to the login page
+            }else{
+                alert('logout unsuccessfully!')
+            }
+
+        }catch(error){
+            console.error("Logout error:", error);
+            alert("Error logging out, please try again.");
+        }
+    }
   
     return (
         <div className={styles.Container}>
-        <div className={styles.button}>
           <div className={styles.center_container}>
             {/* do not change this part */}
-            <button onClick={openDialog}>Upload Identity</button>
+            <button className={styles.main_btn} onClick={openDialog}>Upload Identity</button>
             <dialog ref={dialogRef} className={styles.uploadIdentityDialog}>
                 <div className={styles.file_upload_container}>
                     <div className={styles.top}>
@@ -181,10 +202,9 @@ function Homepage() {
             </dialog>
 
             {/* start from here */}
-            <button><Link to="/camera">Take Picture</Link></button>
-            <button><Link to="">Logout</Link></button>
+            <button className={styles.main_btn}><Link to="/camera">Take Picture</Link></button>
+            <button className={styles.main_btn} onClick={logout}>Logout</button>
            </div>
-        </div>
     </div>
     );
 }
