@@ -1,4 +1,4 @@
-import './admin_login.css';
+import './login.css';
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -33,7 +33,7 @@ function LoginPage() {
 
             if(response.status === 200){
             
-                window.confirm('login successful');
+                window.confirm('login successful');  
                 setTimeout (() => {
                     if(userType === 'users'){
                         window.location.href='/homepage';

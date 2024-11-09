@@ -178,7 +178,7 @@ const Camera = () => {
     };
     
 
-    const isLocationMatch = (location1, location2, margin = 0.01) => {
+    const isLocationMatch = (location1, location2, margin = 0.1) => {
         return (
             Math.abs(location1.latitude - location2.latitude) <= margin &&
             Math.abs(location1.longitude - location2.longitude) <= margin

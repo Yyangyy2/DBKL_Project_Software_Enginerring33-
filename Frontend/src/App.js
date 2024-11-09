@@ -1,6 +1,6 @@
 
-import Login from './Component/Admin login/admin_login'
-import Register from './Component/Admin register/admin_register'
+import Login from './Component/login/login'
+import Register from './Component/register/register'
 import Homepage from './Component/homepage/homepage';
 import Camera from './Component/Camera/Camera';
 

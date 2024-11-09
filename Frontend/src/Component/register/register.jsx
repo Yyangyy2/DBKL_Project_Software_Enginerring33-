@@ -1,9 +1,9 @@
     //css
-    import './admin_register.css';
+    import './register.css';
 
     //function
-    import {checkAccountExists, registerUser} from './admin_register_service'
-    import {arePasswordsMatching, isPasswordValid, isValidEmail, isValidIC} from './admin_register_validation'
+    import {checkAccountExists, registerUser} from './register_service'
+    import {arePasswordsMatching, isPasswordValid, isValidEmail, isValidIC} from './register_validation'
 
     import React, { useState, useEffect, useRef } from 'react';
 
@@ -14,7 +14,7 @@
     import { AiFillEyeInvisible } from "react-icons/ai";
     import { MdVisibility } from "react-icons/md";
 
-    function AdminRegister() {
+    function Register() {
 
         const [username, setUsername] = useState('');
         const [ic, setUserIc ] = useState('');
@@ -292,4 +292,4 @@
         );
     }
 
-    export default AdminRegister;
+    export default Register;
