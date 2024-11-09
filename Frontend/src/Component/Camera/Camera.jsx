@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
+import {Link} from 'react-router-dom';
 
 const Camera = () => {
     const [imageDataUrl, setImageDataUrl] = useState('');
@@ -178,7 +179,7 @@ const Camera = () => {
     };
     
 
-    const isLocationMatch = (location1, location2, margin = 0.1) => {
+    const isLocationMatch = (location1, location2, margin = 0.01) => {
         return (
             Math.abs(location1.latitude - location2.latitude) <= margin &&
             Math.abs(location1.longitude - location2.longitude) <= margin
@@ -332,6 +333,12 @@ const Camera = () => {
                 <div className={`status-indicator ${statusColor}`}>
                     <p>{statusColor.toUpperCase()}</p>
                     </div>
+            </div>
+
+            <div style={{background: '#007bff', borderRadius: '10px',
+                 width: '170px', padding:'10px', position: 'fixed', bottom: '0', right:'0'
+                 , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
+                <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Homepage</span></Link>
             </div>
 
         </div>
