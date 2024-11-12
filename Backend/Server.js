@@ -165,6 +165,21 @@ try{
 }
 });
 
+//logout
+app.post('/logout',(req, res) =>{
+    // Clear the JWT cookie by setting it to an expired date
+    console.log(req.body);
+    
+    res.clearCookie('token',{
+        httpOnly: true,// Ensures the cookie can't be accessed by JavaScript
+        secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
+        sameSite: 'strict', // SameSite policy to prevent CSRF attacks
+    });
+     // Send a response indicating the user is logged out
+    return res.json({ message: 'Logged out successfully' });
+});
+
+
 // check-account-exist endpoint
 app.post('/check-account-exist', (req, res) => {
     const { username, email, ic, userType } = req.body;
@@ -295,7 +310,7 @@ const uploadToImgBB = async (imageBase64) => {
     }
 };
 
-
+  
 
 // Image Upload Endpoint
 app.post('/uploadImage', upload.single('file'), verifyToken, (req, res) => {

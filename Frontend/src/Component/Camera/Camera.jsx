@@ -8,6 +8,7 @@ const Camera = () => {
     const [comparisonResult, setComparisonResult] = useState('');
     const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [selectedLocation, setSelectedLocation] = useState({ latitude: null, longitude: null });
+    const [selectedAddress, setSelectedAddress] = useState('');
     const [autocomplete, setAutocomplete] = useState(null);
     const [warningMessage, setWarningMessage] = useState('');
     const [statusColor, setStatusColor] = useState('');
@@ -178,6 +179,22 @@ const Camera = () => {
         }
     };
     
+    const fetchAddress = async (lat, lng) => {
+        try {
+            const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs`);
+            const data = await response.json();
+            console.log("Geocoding API response:", data); // Log the entire response
+    
+            if (data.results && data.results[0]) {
+                setSelectedAddress(data.results[0].formatted_address);
+            } else {
+                setSelectedAddress('Address not found');
+            }
+        } catch (error) {
+            console.error('Error fetching address:', error);
+            setSelectedAddress('Error fetching address');
+        }
+    };
 
     const isLocationMatch = (location1, location2, margin = 0.01) => {
         return (
@@ -227,6 +244,7 @@ const Camera = () => {
                 const lat = place.geometry.location.lat();
                 const lng = place.geometry.location.lng();
                 setSelectedLocation({ latitude: lat, longitude: lng });
+                fetchAddress(lat, lng);
 
                 saveLocationData();
             }
@@ -237,8 +255,10 @@ const Camera = () => {
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
         setSelectedLocation({ latitude: lat, longitude: lng });
+        fetchAddress(lat, lng); // Fetch address for the selected location
         setWarningMessage(''); // Clear any existing warning message
     };
+
 
     return (
         <div className="camera-container">
@@ -285,6 +305,7 @@ const Camera = () => {
                             <h3>Selected Location:</h3>
                             <p>Latitude: {selectedLocation.latitude}</p>
                             <p>Longitude: {selectedLocation.longitude}</p>
+                            <p>Address: {selectedAddress || 'Loading...'}</p>
                         </div>
             )}
                 </div>
