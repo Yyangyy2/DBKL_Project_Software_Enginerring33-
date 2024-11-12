@@ -82,17 +82,6 @@ app.get('/', (req, res) => {
     return res.json("From Backend Side!");
 });
 
-// Endpoint to fetch all user locations data
-app.get('/AdminLogin', (req, res) => {
-    const query = "SELECT * FROM users_location";
-    db.query(query, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    });
-});
-
 //async for using try catch function
 
 // Login route
@@ -100,85 +89,81 @@ app.post('/Login', async (req, res) => {
     const { email, password, ic, userType } = req.body;
     console.log("Request Received Login", req.body);
 
-     // Validate input based on userType
-if (userType === "Admin") {
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required for Admin login.' });
+    // Input validation based on userType
+    if (userType === "Admin") {
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required for Admin login.' });
+        }
+    } else if (userType === "users") {
+        if (!ic || !password) {
+            return res.status(400).json({ message: 'IC and password are required for User login.' });
+        }
+    } else {
+        return res.status(400).json({ message: 'Invalid user type.' });
     }
-} else if (userType === "users") {
-    if (!ic || !password) {
-        return res.status(400).json({ message: 'IC and password are required for User login.' });
-    }
-} else {
-    return res.status(400).json({ message: 'Invalid user type.' });
-}
 
-try{
-    let parameter
-    let query
+    try {
+        let query;
+        let parameter;
 
-    if(userType === "Admin"){
-        query = "SELECT * FROM admin WHERE email = ?";
-        parameter = [email];
-
-    }else{
-        query = "SELECT * FROM users WHERE ic = ?";
-        parameter = [ic];
-    }
-    
-    db.query(query, parameter, async (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Server error' });
+        // Determine query and parameter based on userType
+        if (userType === "Admin") {
+            query = "SELECT * FROM admin WHERE email = ?";
+            parameter = [email];
+        } else {
+            query = "SELECT * FROM users WHERE ic = ?";
+            parameter = [ic];
         }
 
-        if (results.length === 0) {
-            return res.status(401).json({ message: 'No user found!' });
-        }
+        // Execute database query
+        db.query(query, parameter, async (err, results) => {
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).json({ message: 'Server error' });
+            }
 
-        const user = results[0];// take the first users in the database
+            if (results.length === 0) {
+                return res.status(401).json({ message: 'No user found!' });
+            }
 
-        // Compare password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Incorrect password' });
-        }
+            const user = results[0]; // Use the first user found in the database
 
-        // Create a JSON Web Token (JWT) that securely encodes the user's 
-        //information (such as ID and email) and includes an expiration time.
-        const token = jwt.sign({ id: user.id, email: user.email || user.ic, userType: userType }, process.env.LOGIN_KEY, { expiresIn: '1h' });
+            // Compare password with the hashed password in the database
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Incorrect password' });
+            }
 
-          // Set the JWT in an HttpOnly cookie
-          res.cookie('token', token, {
-            httpOnly: true,   // Prevents client-side JavaScript from accessing the cookie
-            secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-            sameSite: 'strict',  // Strictly same-site to avoid CSRF
-            maxAge: 3600000      // Cookie expiration set to 1 hour
+            // Create a JSON Web Token (JWT) for authenticated users
+            const token = jwt.sign(
+                { id: user.id, email: user.email || user.ic, userType: userType },
+                process.env.LOGIN_KEY,
+                { expiresIn: '1h' }
+            );
+
+            // Set the JWT as an HttpOnly cookie
+            res.cookie('token', token, {
+                httpOnly: true,                       // Prevents client-side JavaScript access
+                secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+                sameSite: 'strict',                   // Strictly same-site to avoid CSRF
+                maxAge: 3600000                       // Cookie expiration set to 1 hour
+            });
+
+            // Respond with user info (without password) and success message
+            return res.json({
+                message: 'Login successful',
+                user: {
+                    id: user.id,
+                    email: user.email || user.ic,
+                    userType: userType
+                }
+            });
         });
-
-        // Respond with user info and token
-        return res.json({ message: 'Login successful', user: { id: user.id, email: user.email || user.ic, userType: userType }, token });
-    });
-}catch(error){
-    console.error('Error during login:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
-}
+    } catch (error) {
+        console.error('Error during login:', error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
 });
-
-//logout
-app.post('/logout',(req, res) =>{
-    // Clear the JWT cookie by setting it to an expired date
-    console.log(req.body);
-    
-    res.clearCookie('token',{
-        httpOnly: true,// Ensures the cookie can't be accessed by JavaScript
-        secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
-        sameSite: 'strict', // SameSite policy to prevent CSRF attacks
-    });
-     // Send a response indicating the user is logged out
-    return res.json({ message: 'Logged out successfully' });
-});
-
 
 // check-account-exist endpoint
 app.post('/check-account-exist', (req, res) => {
@@ -282,7 +267,19 @@ app.post('/register', async (req, res) => {
     }
 });
 
-
+//logout
+app.post('/logout',(req, res) =>{
+    // Clear the JWT cookie by setting it to an expired date
+    console.log(req.body);
+    
+    res.clearCookie('token',{
+        httpOnly: true,// Ensures the cookie can't be accessed by JavaScript
+        secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
+        sameSite: 'strict', // SameSite policy to prevent CSRF attacks
+    });
+     // Send a response indicating the user is logged out
+    return res.json({ message: 'Logged out successfully' });
+});
 
 const uploadToImgBB = async (imageBase64) => {
     try {
@@ -310,7 +307,7 @@ const uploadToImgBB = async (imageBase64) => {
     }
 };
 
-  
+
 
 // Image Upload Endpoint
 app.post('/uploadImage', upload.single('file'), verifyToken, (req, res) => {
@@ -522,6 +519,7 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error updating status' });
     }
 });
+
 
 
 

@@ -1,21 +1,38 @@
 import styles from './homepage.module.css';
-import { Link, Navigate, useNavigate, useEffect } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
 
-import { useRef, useState,  } from 'react';
-
-//icons
+// Icons
 import { LiaTimesSolid } from "react-icons/lia";
 import { LuFilePlus2 } from "react-icons/lu";
-import { BsFileEarmark } from "react-icons/bs";
 import axios from 'axios';
 
 function Homepage() {
     const dialogRef = useRef(null);
-    const [file, setFile] = useState(null); 
-    const [token, setToken] = useState(null);
+    const [file, setFile] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null); // State for the fetched image URL
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Function to fetch the image URL from the server
+    const fetchImageUrl = async () => {
+        try {
+            const response = await axios.get('http://localhost:8081/getImage', { withCredentials: true });
+            if (response.status === 200 && response.data.imageUrl) {
+                setImageUrl(response.data.imageUrl); // Store the URL in state
+            }
+        } catch (error) {
+            console.error("Error fetching image URL:", error);
+        }
+    };
+
+    useEffect(() => {
+        // Fetch the image URL initially when the component mounts
+        fetchImageUrl();
+    }, []);
+
     const openDialog = () => {
+        fetchImageUrl(); // Fetch the latest image URL each time the dialog opens
         dialogRef.current.showModal();
     };
 
@@ -23,9 +40,7 @@ function Homepage() {
         dialogRef.current.close();
     };
 
-    const fileExist = (newFileName) => {
-        return file && file.name === newFileName.name; // Changed to use file
-    };
+    const fileExist = (newFile) => file && file.name === newFile.name;
 
     const validExtensions = (file) => {
         const allowedExtensions = ['jpeg', 'jpg', 'png'];
@@ -33,11 +48,9 @@ function Homepage() {
         return allowedExtensions.includes(fileExtension);
     };
 
-    const validFileSize = (file, maxSizeMb) => {
-        const maxFileSizeInMb = maxSizeMb || 25; // file size maximum 25 MB
-        const fileSize = file.size;
-        const fileSizeInMb = Math.round(fileSize / 1048576);
-        return fileSizeInMb <= maxFileSizeInMb;
+    const validFileSize = (file, maxSizeMb = 25) => {
+        const fileSizeInMb = Math.round(file.size / 1048576);
+        return fileSizeInMb <= maxSizeMb;
     };
 
     const isValidExtension = (file) => {
@@ -67,145 +80,138 @@ function Homepage() {
     const handleFileInput = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile && isNewFile(selectedFile) && isValidExtension(selectedFile) && isValidSize(selectedFile)) {
-            setFile(selectedFile); // Update state to a single file
-            console.log("Valid files selected:", selectedFile);
+            setFile(selectedFile);
+            console.log("Valid file selected:", selectedFile);
         }
-        event.target.value = null; // clear an input
+        event.target.value = null;
     };
 
     const handleFileDrop = (event) => {
-        event.preventDefault(); // Prevent default behavior
+        event.preventDefault();
         const droppedFile = event.dataTransfer.files[0];
         if (droppedFile && isNewFile(droppedFile) && isValidExtension(droppedFile) && isValidSize(droppedFile)) {
-            setFile(droppedFile); // Update state to a single file
-            console.log("Files dropped:", droppedFile);
+            setFile(droppedFile);
+            console.log("File dropped:", droppedFile);
         }
-        event.target.value = null; // clear an input
-    };
-
-    const isImage = (file) => {
-        return file && file.type && file.type.split('/')[0] === "image"; // Safeguard against undefined
     };
 
     const fileSize = (sizeInBytes) => {
-        const names = ['bytes', 'Kib', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-        let count = 0, size = parseInt(sizeInBytes, 10) || 0;
-        while (size >= 1024 && ++count) {
+        const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+        let index = 0, size = parseInt(sizeInBytes, 10) || 0;
+        while (size >= 1024 && ++index) {
             size /= 1024;
         }
-        return size.toFixed(size < 10 && count > 0 ? 1 : 0) + ' ' + names[count];
+        return `${size.toFixed(size < 10 && index > 0 ? 1 : 0)} ${units[index]}`;
     };
 
-    const handleFileDelete = () => {
-        setFile(null); // Reset file
-    };
+    const handleFileDelete = () => setFile(null);
 
     const handleUpload = async () => {
         if (file) {
-            // Directly call uploadFile with the file state
-            await uploadFile(file); 
-            setFile(null); // Clear the file state after upload sucessful
-            closeDialog(); // Close the dialog after upload
-
+            setLoading(true);
+            await uploadFile(file);
+            setLoading(false);
+            setFile(null);
+            closeDialog();
         } else {
             alert("No file selected. Please select an image file to upload.");
         }
     };
 
-    const uploadFile = async (file) =>{
-        const formData = new FormData(); // Corrected the casing of FormData
-        formData.append('file', file);//append file object to form data
-        formData.append('filename', file.name); // Add the filename to form data
+    const uploadFile = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('filename', file.name);
 
-        try{
+        try {
             const response = await axios.post('http://localhost:8081/uploadImage', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',  
-                },
-                withCredentials: true // Ensure cookies, including the HTTP-only token, are sent
+                headers: { 'Content-Type': 'multipart/form-data' },
+                withCredentials: true
             });
 
-            if(response.status === 200){
-                window.confirm(`${file.name} Upload Successful`)
-            }else{
-                alert(`${file.name} Uploaded Unsucessful, due to`, response.data);
+            if (response.status === 200) {
+                alert(`${file.name} uploaded successfully`);
+                setImageUrl(response.data.imageUrl); // Update the image URL after successful upload
+            } else {
+                alert(`${file.name} upload unsuccessful.`);
             }
-            
-        }catch(error){
-            alert(`Error Uploading File: ${error.message}`);
+        } catch (error) {
+            alert(`Error uploading file: ${error.message}`);
         }
-    }
+    };
 
-    //Handle logout
-    const logout = async ()=>{
-        try{
+    const logout = async () => {
+        try {
             const response = await axios.post('http://localhost:8081/logout', {}, {
-                withCredentials: true // Send the request with cookies
+                withCredentials: true
             });
 
-            if(response.status === 200){
-                alert('logout successful');
-                setToken(null);//clear the token
-                navigate('/login')//redirect to the login page
-            }else{
-                alert('logout unsuccessfully!')
+            if (response.status === 200) {
+                alert('Logout successful');
+                navigate('/login');
+            } else {
+                alert('Logout unsuccessful');
             }
-
-        }catch(error){
+        } catch (error) {
             console.error("Logout error:", error);
             alert("Error logging out, please try again.");
         }
-    }
-  
+    };
+
     return (
         <div className={styles.Container}>
-          <div className={styles.center_container}>
-            {/* do not change this part */}
-            <button className={styles.main_btn} onClick={openDialog}>Upload Identity</button>
-            <dialog ref={dialogRef} className={styles.uploadIdentityDialog}>
-                <div className={styles.file_upload_container}>
-                    <div className={styles.top}>
-                        <h3 className={styles.title}>Upload Image</h3>
+            <div className={styles.center_container}>
+                {/* Conditionally render the fetched image if it exists */}
+                {imageUrl && (
+                    <div className={styles.preview_existing_image}>
+                        <h3 className={styles.title}>Existing Uploaded Image:</h3>
+                        <img src={imageUrl} alt="Uploaded" className={styles.existing_image} />
                     </div>
-                    <div className={styles.middle}>
-                        <label className={styles.file_drop_area} onDrop={handleFileDrop} onDragOver={handleFileDrop}>
-                            <LuFilePlus2 className={styles.icon} />
-                            <p className={styles.description}>Drop your image here <span className={styles.color_primary}>browse</span></p>
-                            <p className={styles.text_muted}>Max. File Size 25 MB</p>
-                            <input type="file" onChange={handleFileInput} accept='.jpeg, .jpg, .png' />
-                        </label>
-                        <div className={styles.preview_area}>
-                            {file && ( // Updated to check if file is defined
-                                <div className={styles.preview_card}>
-                                    <div className={styles.column_avater}>
-                                        {isImage(file) ? <img src={URL.createObjectURL(file)} alt={file.name}/> : <BsFileEarmark />}
-                                    </div>
+                )}
 
-                                    <div className={styles.column}>
-                                        <p className={styles.name}>{file.name}</p>
-                                        <p className={styles.text_muted_size}>{fileSize(file.size)}</p>
+                <button className={styles.main_btn} onClick={openDialog}>Upload Identity</button>
+                <dialog ref={dialogRef} className={styles.uploadIdentityDialog}>
+                    <div className={styles.file_upload_container}>
+                        <div className={styles.top}>
+                            <h3 className={styles.title}>Upload Image</h3>
+                        </div>
+                        <div className={styles.middle}>
+                            <label className={styles.file_drop_area} onDrop={handleFileDrop} onDragOver={(e) => e.preventDefault()}>
+                                <LuFilePlus2 className={styles.icon} />
+                                <p className={styles.description}>Drop your image here or <span className={styles.color_primary}>browse</span></p>
+                                <p className={styles.text_muted}>Max. File Size 25 MB</p>
+                                <input type="file" onChange={handleFileInput} accept='.jpeg, .jpg, .png' />
+                            </label>
+                            <div className={styles.preview_area}>
+                                {file && (
+                                    <div className={styles.preview_card}>
+                                        <div className={styles.column_avatar}>
+                                            <img src={URL.createObjectURL(file)} alt={file.name} />
+                                        </div>
+                                        <div className={styles.column}>
+                                            <p className={styles.name}>{file.name}</p>
+                                            <p className={styles.text_muted_size}>{fileSize(file.size)}</p>
+                                        </div>
+                                        <div className={styles.column_last}>
+                                            <LiaTimesSolid className={styles.cancel_icon} onClick={handleFileDelete} />
+                                        </div>
                                     </div>
-
-                                    <div className={styles.column_last}>
-                                        <LiaTimesSolid className={styles.cancel_icon} onClick={handleFileDelete} />
-                                    </div>
-
-                                </div>
-                            )}
+                                )}
+                            </div>
+                        </div>
+                        <div className={styles.bottom}>
+                            <button id={styles.btn} onClick={closeDialog}>Cancel</button>
+                            <button className={styles.btn_primary} onClick={handleUpload} disabled={loading}>
+                                {loading ? "Uploading..." : "Save"}
+                            </button>
                         </div>
                     </div>
-                    <div className={styles.bottom}>
-                        <button id={styles.btn} onClick={closeDialog}>Cancel</button>
-                        <button className={styles.btn_primary} onClick={handleUpload}>Save</button>
-                    </div>
-                </div>
-            </dialog>
+                </dialog>
 
-            {/* start from here */}
-            <button className={styles.main_btn}><Link to="/camera">Take Picture</Link></button>
-            <button className={styles.main_btn} onClick={logout}>Logout</button>
-           </div>
-    </div>
+                <button className={styles.main_btn}><Link to="/camera">Take Picture</Link></button>
+                <button className={styles.main_btn} onClick={logout}>Logout</button>
+            </div>
+        </div>
     );
 }
 
