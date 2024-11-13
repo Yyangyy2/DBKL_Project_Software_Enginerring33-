@@ -27,6 +27,7 @@ function AdminHomepage() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (response.status === 200) {
+                    console.log("Fetched users:", response.data); // Debugging log
                     setUsers(response.data);
                 } else {
                     console.error("Failed to fetch users");
@@ -35,8 +36,10 @@ function AdminHomepage() {
                 console.error("Error fetching users:", error);
             }
         };
-        if (token) fetchUsers();
-    }, [token]);
+    
+        fetchUsers();
+    }, []);
+    
 
     // Logout function to clear token and redirect to login page
     const handleLogout = async () => {
