@@ -305,6 +305,67 @@ const uploadToImgBB = async (imageBase64) => {
     }
 };
 
+// Route to get uploaded image
+app.get('/getUploadedImage', verifyToken, async (req, res) => {
+    try {
+        // Retrieve the user ID from the verified token in the request object
+        const userId = req.userId;
+        
+        if (!userId) {
+            console.error("User ID not provided in request.");
+            return res.status(400).json({ error: 'User ID not found in request' });
+        }
+
+        // Database query to fetch user image
+        const query = 'SELECT images FROM users WHERE id = ?';
+        console.log("Executing query for userId:", userId);
+
+        db.query(query, [userId], (err, results) => {
+            if (err) {
+                console.error('Database query error:', err.message); // Log database errors
+                return res.status(500).json({ error: 'Database query error' });
+            }
+            if (results.length === 0 || !results[0].images) {
+                console.log('No image found for userId:', userId);
+                return res.status(404).json({ error: 'No image found' });
+            }
+
+            console.log('Image found:', results[0]);
+
+            // Extract and validate base64 data
+            const base64Data = results[0].images.includes(';base64,') 
+                ? results[0].images.split(';base64,').pop() 
+                : results[0].images;
+            
+            if (!base64Data) {
+                console.error("Invalid image format in database for userId:", userId);
+                return res.status(500).json({ error: 'Invalid image format in database' });
+            }
+
+            // Convert the base64 image to a buffer
+            let imageBuffer;
+            try {
+                imageBuffer = Buffer.from(base64Data, 'base64');
+            } catch (conversionError) {
+                console.error("Error converting base64 data for userId:", userId, conversionError.message);
+                return res.status(500).json({ error: 'Error processing image data' });
+            }
+
+            // Set the appropriate headers for image response
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.setHeader('Content-Disposition', 'inline; filename="uploadedImage.jpg"');
+
+            // Send the image buffer as a JPEG
+            res.send(imageBuffer);
+        });
+        
+    } catch (error) {
+        console.error("Error retrieving image:", error.message);
+        res.status(500).json({ error: 'Error retrieving image' });
+    }
+});
+
+
 
 
 // Image Upload Endpoint

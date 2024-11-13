@@ -1,8 +1,7 @@
-// File: ./Component/adminhomepage/adminhomepage.js
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import styles from './adminhomepage.module.css';
 
 function AdminHomepage() {
@@ -54,6 +53,16 @@ function AdminHomepage() {
         }
     };
 
+    const mapContainerStyle = {
+        width: '100%',
+        height: '400px',
+    };
+
+    const center = {
+        lat: 3.1390, // Example latitude for center of map
+        lng: 101.6869, // Example longitude for center of map
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -70,6 +79,19 @@ function AdminHomepage() {
                         <Link to="/view-reports" className={styles.actionButton}>View Reports</Link>
                         <Link to="/settings" className={styles.actionButton}>Settings</Link>
                     </div>
+                </section>
+
+                <section className={styles.section}>
+                    <h2>Map</h2>
+                    <LoadScript googleMapsApiKey="AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs" libraries={['places']}>
+                        <GoogleMap
+                            mapContainerStyle={mapContainerStyle}
+                            center={center}
+                            zoom={10}
+                        >
+                            {/* Add markers or other map elements here */}
+                        </GoogleMap>
+                    </LoadScript>
                 </section>
 
                 <section className={styles.section}>
