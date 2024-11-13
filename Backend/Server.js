@@ -465,24 +465,25 @@ app.post('/compareFaces', verifyToken, async (req, res) => {
 });
 
 app.post('/saveLocation', verifyToken, async (req, res) => {
-    const { capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude } = req.body;
+    const { capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude, selectedAddress } = req.body;
     const userId = req.user.id;
 
     console.log('Endpoint reached'); // Test log
 
     const query = `
-        INSERT INTO users (id, captured_latitude, captured_longitude, selected_latitude, selected_longitude)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO users (id, captured_latitude, captured_longitude, selected_latitude, selected_longitude, selected_address)
+        VALUES (?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
             captured_latitude = VALUES(captured_latitude),
             captured_longitude = VALUES(captured_longitude),
             selected_latitude = VALUES(selected_latitude),
-            selected_longitude = VALUES(selected_longitude)
+            selected_longitude = VALUES(selected_longitude),
+            selected_address = VALUES(selected_address)
     `;
 
     try {
         await new Promise((resolve, reject) => {
-            db.query(query, [userId, capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude], (err, results) => {
+            db.query(query, [userId, capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude, selectedAddress], (err, results) => {
                 if (err) return reject(err);
                 resolve(results);
             });
@@ -493,6 +494,7 @@ app.post('/saveLocation', verifyToken, async (req, res) => {
         res.status(500).send('Error saving location');
     }
 });
+
 
 // Endpoint to save status in the users table
 app.post('/saveStatus', verifyToken, async (req, res) => {
@@ -520,7 +522,18 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
     }
 });
 
-
+// Endpoint to fetch all users
+app.get('/users', verifyToken, (req, res) => {
+    const query = "SELECT * FROM users";
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error("Error fetching users:", err);
+            res.status(500).json({ error: "An error occurred while fetching users." });
+        } else {
+            res.status(200).json(results);
+        }
+    });
+});
 
 
 // Start the server

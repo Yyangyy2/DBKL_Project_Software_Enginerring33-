@@ -10,16 +10,22 @@ function AdminHomepage() {
     const [token, setToken] = useState(null);
     const [users, setUsers] = useState([]);
 
+    // Load token from local storage on component mount
     useEffect(() => {
-        const savedToken = localStorage.getItem('token');
-        if (savedToken) setToken(savedToken);
+        const loadToken = () => {
+            const savedToken = localStorage.getItem('token');
+            if (savedToken) setToken(savedToken);
+        };
+        loadToken();
     }, []);
 
-    // Fetch users from the database
+    // Fetch users from the backend
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:8081/users');
+                const response = await axios.get('http://localhost:8081/users', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 if (response.status === 200) {
                     setUsers(response.data);
                 } else {
@@ -29,17 +35,15 @@ function AdminHomepage() {
                 console.error("Error fetching users:", error);
             }
         };
+        if (token) fetchUsers();
+    }, [token]);
 
-        fetchUsers();
-    }, []);
-
-
-    const logout = async () => {
+    // Logout function to clear token and redirect to login page
+    const handleLogout = async () => {
         try {
             const response = await axios.post('http://localhost:8081/logout', {}, {
                 withCredentials: true,
             });
-
             if (response.status === 200) {
                 alert('Logout successful');
                 setToken(null);
@@ -58,7 +62,7 @@ function AdminHomepage() {
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1>Admin Dashboard</h1>
-                <button onClick={logout} className={styles.logoutButton}>
+                <button onClick={handleLogout} className={styles.logoutButton}>
                     Logout
                 </button>
             </header>
@@ -79,7 +83,6 @@ function AdminHomepage() {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-
                                     <th>IC</th>
                                     <th>Images</th>
                                     <th>Captured Latitude</th>
@@ -90,7 +93,7 @@ function AdminHomepage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map(user => (
+                                {users.map((user) => (
                                     <tr key={user.id}>
                                         <td>{user.id}</td>
                                         <td>{user.ic}</td>

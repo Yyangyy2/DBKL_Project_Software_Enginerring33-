@@ -8,7 +8,7 @@ const Camera = () => {
     const [comparisonResult, setComparisonResult] = useState('');
     const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [selectedLocation, setSelectedLocation] = useState({ latitude: null, longitude: null });
-    const [selectedAddress, setSelectedAddress] = useState('');
+    const [selectedAddress, setSelectedAddress] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [warningMessage, setWarningMessage] = useState('');
     const [statusColor, setStatusColor] = useState('');
@@ -65,7 +65,7 @@ const Camera = () => {
         }
     };
     
-    const saveLocationData = async (capturedLocation, selectedLocation) => {
+    const saveLocationData = async (capturedLocation, selectedLocation, selectedAddress) => {
         if (!capturedLocation || capturedLocation.latitude === null || capturedLocation.longitude === null) {
             console.error('Captured location is null. Please ensure location is captured before saving.');
             return;
@@ -83,6 +83,7 @@ const Camera = () => {
                     capturedLongitude: capturedLocation.longitude,
                     selectedLatitude: selectedLocation.latitude,
                     selectedLongitude: selectedLocation.longitude,
+                    selectedAddress: selectedAddress,
                 }),
             });
     
@@ -125,7 +126,7 @@ const Camera = () => {
         // Capture and save location only
         const locationData = await captureLocation();
         if (locationData) {
-            await saveLocationData(locationData, selectedLocation);
+            await saveLocationData(locationData, selectedLocation, selectedAddress);
         }
     };
     
@@ -183,10 +184,11 @@ const Camera = () => {
         try {
             const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs`);
             const data = await response.json();
-            console.log("Geocoding API response:", data); // Log the entire response
+            console.log("Geocoding API response:", data);
     
             if (data.results && data.results[0]) {
-                setSelectedAddress(data.results[0].formatted_address);
+                const address = data.results[0].formatted_address;
+                setSelectedAddress(address);
             } else {
                 setSelectedAddress('Address not found');
             }
@@ -195,6 +197,7 @@ const Camera = () => {
             setSelectedAddress('Error fetching address');
         }
     };
+    
 
     const isLocationMatch = (location1, location2, margin = 0.01) => {
         return (
@@ -245,11 +248,12 @@ const Camera = () => {
                 const lng = place.geometry.location.lng();
                 setSelectedLocation({ latitude: lat, longitude: lng });
                 fetchAddress(lat, lng);
-
+    
                 saveLocationData();
             }
         }
     };
+    
 
     const handleMapClick = (event) => {
         const lat = event.latLng.lat();
