@@ -15,6 +15,7 @@ const db = mysql.createConnection({
     database: 'dbkl_project', // Your database name
 });
 
+
 db.connect(error => {
     if (error) {
         console.error('Error connecting to the database:', error);

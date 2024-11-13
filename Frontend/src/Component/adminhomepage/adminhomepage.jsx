@@ -21,6 +21,7 @@ function AdminHomepage() {
             try {
                 const response = await axios.get('http://localhost:8081/users');
                 if (response.status === 200) {
+                    console.log("Fetched users:", response.data); // Debugging log
                     setUsers(response.data);
                 } else {
                     console.error("Failed to fetch users");
@@ -29,9 +30,10 @@ function AdminHomepage() {
                 console.error("Error fetching users:", error);
             }
         };
-
+    
         fetchUsers();
     }, []);
+    
 
 
     const logout = async () => {
