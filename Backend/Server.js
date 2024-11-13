@@ -34,8 +34,6 @@ app.use(cors({
     credentials: true                 // Allow cookies to be sent
 }));
 
-
-
 // MySQL connection
 const db = mysql.createConnection({
     host: "localhost",
@@ -465,24 +463,25 @@ app.post('/compareFaces', verifyToken, async (req, res) => {
 });
 
 app.post('/saveLocation', verifyToken, async (req, res) => {
-    const { capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude } = req.body;
+    const { capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude, selectedAddress } = req.body;
     const userId = req.user.id;
 
     console.log('Endpoint reached'); // Test log
 
     const query = `
-        INSERT INTO users (id, captured_latitude, captured_longitude, selected_latitude, selected_longitude)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO users (id, captured_latitude, captured_longitude, selected_latitude, selected_longitude, selected_address)
+        VALUES (?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE
             captured_latitude = VALUES(captured_latitude),
             captured_longitude = VALUES(captured_longitude),
             selected_latitude = VALUES(selected_latitude),
-            selected_longitude = VALUES(selected_longitude)
+            selected_longitude = VALUES(selected_longitude),
+            selected_address = VALUES(selected_address)
     `;
 
     try {
         await new Promise((resolve, reject) => {
-            db.query(query, [userId, capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude], (err, results) => {
+            db.query(query, [userId, capturedLatitude, capturedLongitude, selectedLatitude, selectedLongitude, selectedAddress], (err, results) => {
                 if (err) return reject(err);
                 resolve(results);
             });
@@ -520,7 +519,19 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
     }
 });
 
-
+// Define a route to fetch data (example: fetching all users)
+app.get('/users', (req, res) => {
+    const query = 'SELECT * FROM users';
+    db.query(query, (error, results) => {
+        if (error) {
+            console.error('Error retrieving users:', error);
+            res.status(500).json({ error: 'Failed to retrieve users' });
+        } else {
+            res.json(results);
+            console.log(`result: ${results}`)
+        }
+    });
+});
 
 
 // Start the server

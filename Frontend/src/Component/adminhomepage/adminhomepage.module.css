@@ -44,6 +44,7 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .section h2 {
@@ -78,11 +79,13 @@
     text-decoration: none;
 }
 
-/* adminhomepage.module.css */
+/* Updated userTable styles */
 .userTable {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    overflow-x: auto;
 }
 
 .userTable th,
@@ -90,9 +93,39 @@
     padding: 8px 12px;
     border: 1px solid #ddd;
     text-align: left;
+    word-wrap: break-word;
 }
 
 .userTable th {
     background-color: #f4f4f4;
     font-weight: bold;
+    font-size: 14px;
+}
+
+.userTable td {
+    font-size: 14px;
+}
+
+.userTable img {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 4px;
+}
+
+/* Add horizontal scrolling for smaller screens */
+@media (max-width: 768px) {
+    .userTable {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .userTable th,
+    .userTable td {
+        font-size: 12px;
+    }
+
+    .actionButton {
+        font-size: 14px;
+    }
 }

@@ -34,8 +34,6 @@ function AdminHomepage() {
         fetchUsers();
     }, []);
     
-
-
     const logout = async () => {
         try {
             const response = await axios.post('http://localhost:8081/logout', {}, {
@@ -81,7 +79,6 @@ function AdminHomepage() {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-
                                     <th>IC</th>
                                     <th>Images</th>
                                     <th>Captured Latitude</th>
@@ -89,6 +86,7 @@ function AdminHomepage() {
                                     <th>Selected Latitude</th>
                                     <th>Selected Longitude</th>
                                     <th>Status</th>
+                                    <th>Shop Address</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,7 +95,7 @@ function AdminHomepage() {
                                         <td>{user.id}</td>
                                         <td>{user.ic}</td>
                                         <td>
-                                            {user.images && user.images.length > 0 ? (
+                                            {Array.isArray(user.images) && user.images.length > 0 ? (
                                                 user.images.map((image, index) => (
                                                     <img
                                                         key={index}
@@ -117,6 +115,7 @@ function AdminHomepage() {
                                         <td>{user.selected_latitude}</td>
                                         <td>{user.selected_longitude}</td>
                                         <td>{user.status}</td>
+                                        <td>{user.selected_address}</td>
                                     </tr>
                                 ))}
                             </tbody>
