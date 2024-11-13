@@ -492,7 +492,6 @@ app.post('/saveLocation', verifyToken, async (req, res) => {
         res.status(500).send('Error saving location');
     }
 });
-
 // Endpoint to save status in the users table
 app.post('/saveStatus', verifyToken, async (req, res) => {
     const { status } = req.body;
@@ -519,6 +518,8 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
     }
 });
 
+/////////////////////////////////////RETRIVE USERS DATABASE INTO ADMIN//////////////////////////////////
+
 // Define a route to fetch data (example: fetching all users)
 app.get('/users', (req, res) => {
     const query = 'SELECT * FROM users';
@@ -533,6 +534,27 @@ app.get('/users', (req, res) => {
     });
 });
 
+
+//////////////////////////////
+
+// Delete user route
+app.delete('/users/:id', (req, res) => {
+    const userId = req.params.id;
+    const deleteQuery = 'DELETE FROM users WHERE id = ?';
+
+    db.query(deleteQuery, [userId], (error, result) => {
+        if (error) {
+            console.error('Error deleting user:', error);
+            return res.status(500).json({ error: 'Failed to delete user' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ message: 'User deleted successfully' });
+    });
+});
 
 // Start the server
 const PORT = 8081;

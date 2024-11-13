@@ -54,6 +54,22 @@ function AdminHomepage() {
         }
     };
 
+    // Delete user function
+    const deleteUser = async (userId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8081/users/${userId}`);
+            if (response.status === 200) {
+                alert("User deleted successfully");
+                setUsers(users.filter(user => user.id !== userId)); // Remove deleted user from state
+            } else {
+                console.error("Failed to delete user");
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("Error deleting user, please try again.");
+        }
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -87,6 +103,7 @@ function AdminHomepage() {
                                     <th>Selected Longitude</th>
                                     <th>Status</th>
                                     <th>Shop Address</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -99,7 +116,7 @@ function AdminHomepage() {
                                                 user.images.map((image, index) => (
                                                     <img
                                                         key={index}
-                                                        src={image}
+                                                        src={image.startsWith('data:image') ? image : `data:image/jpeg;base64,${image}`}
                                                         alt="User"
                                                         width="50"
                                                         height="50"
@@ -116,6 +133,9 @@ function AdminHomepage() {
                                         <td>{user.selected_longitude}</td>
                                         <td>{user.status}</td>
                                         <td>{user.selected_address}</td>
+                                        <td>
+                                            <button onClick={() => deleteUser(user.id)}>Delete</button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
