@@ -10,22 +10,16 @@ function AdminHomepage() {
     const [token, setToken] = useState(null);
     const [users, setUsers] = useState([]);
 
-    // Load token from local storage on component mount
     useEffect(() => {
-        const loadToken = () => {
-            const savedToken = localStorage.getItem('token');
-            if (savedToken) setToken(savedToken);
-        };
-        loadToken();
+        const savedToken = localStorage.getItem('token');
+        if (savedToken) setToken(savedToken);
     }, []);
 
-    // Fetch users from the backend
+    // Fetch users from the database
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:8081/users', {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const response = await axios.get('http://localhost:8081/users');
                 if (response.status === 200) {
                     console.log("Fetched users:", response.data); // Debugging log
                     setUsers(response.data);
@@ -40,13 +34,12 @@ function AdminHomepage() {
         fetchUsers();
     }, []);
     
-
-    // Logout function to clear token and redirect to login page
-    const handleLogout = async () => {
+    const logout = async () => {
         try {
             const response = await axios.post('http://localhost:8081/logout', {}, {
                 withCredentials: true,
             });
+
             if (response.status === 200) {
                 alert('Logout successful');
                 setToken(null);
@@ -65,7 +58,7 @@ function AdminHomepage() {
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1>Admin Dashboard</h1>
-                <button onClick={handleLogout} className={styles.logoutButton}>
+                <button onClick={logout} className={styles.logoutButton}>
                     Logout
                 </button>
             </header>
@@ -93,15 +86,16 @@ function AdminHomepage() {
                                     <th>Selected Latitude</th>
                                     <th>Selected Longitude</th>
                                     <th>Status</th>
+                                    <th>Shop Address</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map((user) => (
+                                {users.map(user => (
                                     <tr key={user.id}>
                                         <td>{user.id}</td>
                                         <td>{user.ic}</td>
                                         <td>
-                                            {user.images && user.images.length > 0 ? (
+                                            {Array.isArray(user.images) && user.images.length > 0 ? (
                                                 user.images.map((image, index) => (
                                                     <img
                                                         key={index}
@@ -121,6 +115,7 @@ function AdminHomepage() {
                                         <td>{user.selected_latitude}</td>
                                         <td>{user.selected_longitude}</td>
                                         <td>{user.status}</td>
+                                        <td>{user.selected_address}</td>
                                     </tr>
                                 ))}
                             </tbody>

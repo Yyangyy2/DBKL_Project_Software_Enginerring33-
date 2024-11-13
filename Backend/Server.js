@@ -34,8 +34,6 @@ app.use(cors({
     credentials: true                 // Allow cookies to be sent
 }));
 
-
-
 // MySQL connection
 const db = mysql.createConnection({
     host: "localhost",
@@ -495,7 +493,6 @@ app.post('/saveLocation', verifyToken, async (req, res) => {
     }
 });
 
-
 // Endpoint to save status in the users table
 app.post('/saveStatus', verifyToken, async (req, res) => {
     const { status } = req.body;
@@ -522,15 +519,16 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
     }
 });
 
-// Endpoint to fetch all users
-app.get('/users', verifyToken, (req, res) => {
-    const query = "SELECT * FROM users";
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("Error fetching users:", err);
-            res.status(500).json({ error: "An error occurred while fetching users." });
+// Define a route to fetch data (example: fetching all users)
+app.get('/users', (req, res) => {
+    const query = 'SELECT * FROM users';
+    db.query(query, (error, results) => {
+        if (error) {
+            console.error('Error retrieving users:', error);
+            res.status(500).json({ error: 'Failed to retrieve users' });
         } else {
-            res.status(200).json(results);
+            res.json(results);
+            console.log(`result: ${results}`)
         }
     });
 });
