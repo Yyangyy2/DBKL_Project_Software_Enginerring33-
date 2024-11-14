@@ -84,6 +84,7 @@
     width: 100%;
     max-width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* Ensures even column widths */
     margin-top: 20px;
     overflow-x: auto;
 }
@@ -104,6 +105,23 @@
 
 .userTable td {
     font-size: 14px;
+}
+
+/* Styling for action buttons within the table */
+.userTable .tableActionButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin: 0 3px;
+    display: inline-block;
+}
+
+.userTable .tableActionButton:hover {
+    background-color: #0056b3;
 }
 
 .userTable img {

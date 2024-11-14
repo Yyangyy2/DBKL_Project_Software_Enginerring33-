@@ -13,36 +13,51 @@ import { MdVisibility } from "react-icons/md";
 
 function LoginPage() {
     const [email, setEmail] = useState('');
-    const [ic, setUserIc ] = useState('');
+    const [ic, setUserIc] = useState('');
     const [password, setPassword] = useState('');
     const [visible, setVisible] = useState(false);
     const [loginStatus, setLoginStatus] = useState('');
-    const [userType, setUserType ] = useState('users'); // Set default to "users"
+    const [userType, setUserType] = useState('');
+
+    // Default admin credentials
+    const defaultAdmin = {
+        email: "admin@gmail.com",
+        password: "admin123@"
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         setLoginStatus(''); // Clear previous login status
+
+        // Check if the credentials match the default admin account
+        if (userType === 'Admin' && email === defaultAdmin.email && password === defaultAdmin.password) {
+            window.confirm('Login successful as Admin');
+            setTimeout(() => {
+                window.location.href = '/adminhomepage';
+            }, 2000);
+            return;
+        }
+
         try {
+            // If not using default credentials, proceed with database check
             const response = await axios.post('http://localhost:8081/Login', {
                 password,
                 userType,
                 ...(userType === "users" ? { ic } : { email })
-            },{
-                withCredentials: true  // Enable credentials for cookies
+            }, {
+                withCredentials: true // Enable credentials for cookies
             });
 
-            if(response.status === 200){
-            
-                window.confirm('login successful');  
-                setTimeout (() => {
-                    if(userType === 'users'){
-                        window.location.href='/homepage';
-                    }else{
-                        window.location.href='/adminhomepage';
+            if (response.status === 200) {
+                window.confirm('Login successful');
+                setTimeout(() => {
+                    if (userType === 'users') {
+                        window.location.href = '/homepage';
+                    } else {
+                        window.location.href = '/adminhomepage';
                     }
                 }, 2000);
             }
-            
         } catch (error) {
             setLoginStatus('Login failed. Please try again.');
         }
@@ -62,8 +77,8 @@ function LoginPage() {
                             <input
                                 type="radio"
                                 name="userType"
+                                id="user"
                                 value="users"
-                                checked={userType === "users"} // Checked by default
                                 onChange={(e) => setUserType(e.target.value)}
                             /> Users
                             <span></span>
@@ -72,13 +87,13 @@ function LoginPage() {
                             <input
                                 type="radio"
                                 name="userType"
+                                id="admin"
                                 value="Admin"
-                                checked={userType === "Admin"}
                                 onChange={(e) => setUserType(e.target.value)}
                             /> Admin
                             <span></span>
                         </label>
-                    </div>  
+                    </div>
 
                     <>
                         {userType === "Admin" ? (
@@ -98,7 +113,7 @@ function LoginPage() {
                             </div>
                         ) : (
                             <div className="inputDiv">
-                                <label htmlFor="IC">IC:</label>
+                                <label htmlFor="ic">IC:</label>
                                 <div className="input flex">
                                     <FaUserShield className='icon' />
                                     <input
@@ -126,15 +141,14 @@ function LoginPage() {
                                 required
                                 onChange={(e) => setPassword(e.target.value)}
                             />
-
                             <div onClick={() => setVisible(!visible)}>
-                                {visible ? <MdVisibility id="password-visible"/> : <AiFillEyeInvisible id="password-visible" />}
-                            </div> 
+                                {visible ? <MdVisibility id="password-visible" /> : <AiFillEyeInvisible id="password-visible" />}
+                            </div>
                         </div>
 
                         {loginStatus && <span className="status">{loginStatus}</span>}
                     </div>
-                   
+
                     <button type="submit" className='btn'>
                         <span>Login</span>
                     </button>

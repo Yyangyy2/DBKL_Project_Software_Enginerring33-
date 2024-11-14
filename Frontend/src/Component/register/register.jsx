@@ -1,7 +1,7 @@
 // React imports and CSS
 import './register.css';
 import { checkAccountExists, registerUser } from './register_service';
-import { arePasswordsMatching, isPasswordValid, isValidEmail, isValidIC } from './register_validation';
+import { arePasswordsMatching, isPasswordValid, isValidIC } from './register_validation';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaUserShield } from "react-icons/fa";
@@ -12,13 +12,11 @@ import { MdVisibility } from "react-icons/md";
 function Register() {
     const [username, setUsername] = useState('');
     const [ic, setUserIc] = useState('');
-    const [email, setEmail] = useState(''); 
     const [password, setPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState('');
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
     const [registerStatus, setRegisterStatus] = useState('');
-    const [userType, setUserType] = useState('');
 
     // Password and Confirm Password refs for validation
     const passwordRef = useRef(null);
@@ -84,31 +82,19 @@ function Register() {
             return;
         }
 
-        // Check user type and validate accordingly
-        if (userType === "users") {
-            if (!isValidIC(ic)) {
-                setRegisterStatus('Invalid IC format. Please use XXXXXX-XX-XXXX format.');
-                return;
-            }
-        } else if (userType === "Admin") {
-            if (!isValidEmail(email)) {
-                setRegisterStatus('Invalid email format.');
-                return;
-            }
+        if (!isValidIC(ic)) {
+            setRegisterStatus('Invalid IC format. Please use XXXXXX-XX-XXXX format.');
+            return;
         }
 
         // Check if account exists
         try {
-            const response = await checkAccountExists(username, email, ic, userType);
-            const existEmail = 'An account already exists with this email.';
+            const response = await checkAccountExists(username, ic);
             const existUsername = 'An account already exists with this username.';
             const existIC = 'An account already exists with this IC.';
 
-            if (response.message === existEmail || response.message === existUsername) {
+            if (response.message === existUsername || response.message === existIC) {
                 setRegisterStatus('An account already exists!');
-                return;
-            } else if (response.message === existIC) {
-                setRegisterStatus('An account already exists with this IC.');
                 return;
             } else {
                 window.confirm('Sign Up Successful');
@@ -120,7 +106,7 @@ function Register() {
 
         // Register user
         try {
-            const response = await registerUser(username, ic, email, password, userType);
+            const response = await registerUser(username, ic, password);
             if (response.message === 'Sign Up Successful') {
                 setTimeout(() => {
                     window.location.href = '/login';
@@ -136,81 +122,26 @@ function Register() {
         <div className='loginPage'>
             <div className="container">
                 <div className="headerDiv">
-                    <h2>Sign Up</h2>
+                <h2 style={{ fontWeight: 'bold' }}>User Registration</h2>
                 </div>
                 <form onSubmit={handleSubmit} className='form'>
-                    <div className='radio-group'>
-                        <label className='radio'>
-                            <input
-                                type="radio"
-                                name="userType"
-                                id="user"
-                                value="users"
-                                onChange={(e) => setUserType(e.target.value)}
-                            /> Users
-                            <span></span>
-                        </label>
-                        <label className='radio'>
-                            <input
-                                type="radio"
-                                name="userType"
-                                id="admin"
-                                value="Admin"
-                                onChange={(e) => setUserType(e.target.value)}
-                            /> Admin
-                            <span></span>
-                        </label>
-                    </div>
-                    {userType === "Admin" ? (
-                        <div>
-                            <div className="inputDiv">
-                                <label htmlFor="username">Username:</label>
-                                <div className="input flex">
-                                    <FaUserShield className='icon' />
-                                    <input
-                                        type="text"
-                                        id="username"
-                                        placeholder="Username"
-                                        value={username}
-                                        required
-                                        onChange={(e) => setUsername(e.target.value)}
-                                    />
-                                </div>
-                            </div>
+                    <div className="inputDiv">
+                </div>
 
-                            <div className="inputDiv">
-                                <label htmlFor="email">Email:</label>
-                                <div className="input flex">
-                                    <FaUserShield className='icon' />
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        placeholder="Email"
-                                        value={email}
-                                        required
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                            </div>
+                    <div className="inputDiv">
+                        <label htmlFor="IC">IC:</label>
+                        <div className="input flex">
+                            <FaUserShield className='icon' />
+                            <input
+                                type="text"
+                                id="ic"
+                                placeholder="IC"
+                                value={ic}
+                                required
+                                onChange={(e) => setUserIc(e.target.value)}
+                            />
                         </div>
-                    ) : (
-                        <div>
-                            <div className="inputDiv">
-                                <label htmlFor="IC">IC:</label>
-                                <div className="input flex">
-                                    <FaUserShield className='icon' />
-                                    <input
-                                        type="text"
-                                        id="ic"
-                                        placeholder="IC"
-                                        value={ic}
-                                        required
-                                        onChange={(e) => setUserIc(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    </div>
 
                     <div className="inputDiv">  
                         <label htmlFor="password">Password:</label>
