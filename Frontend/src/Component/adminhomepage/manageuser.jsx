@@ -119,10 +119,10 @@ function ManageUsers() {
     };
 
     const filteredUsers = users.filter(user =>
-        user.ic.toLowerCase().includes(search.toLowerCase()) ||
-        user.status.toLowerCase().includes(search.toLowerCase())
+        (user.ic && user.ic.toLowerCase().includes(search.toLowerCase())) ||
+        (user.status && user.status.toLowerCase().includes(search.toLowerCase()))
     );
-
+    
     return (
         <div className={styles.container}>
             <header className={styles.header}>
