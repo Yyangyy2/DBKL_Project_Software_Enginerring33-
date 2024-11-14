@@ -1,4 +1,3 @@
-// File: ./Component/adminhomepage/AdminHomepage.jsx
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,13 +7,7 @@ import styles from './adminhomepage.module.css';
 
 function AdminHomepage() {
     const navigate = useNavigate();
-    const [token, setToken] = useState(null);
     const [users, setUsers] = useState([]);
-
-    useEffect(() => {
-        const savedToken = localStorage.getItem('token');
-        if (savedToken) setToken(savedToken);
-    }, []);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -42,15 +35,6 @@ function AdminHomepage() {
         }
     };
 
-    const deleteUser = async (userId) => {
-        try {
-            await axios.delete(`http://localhost:8081/users/${userId}`);
-            setUsers(users.filter(user => user.id !== userId));
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
-    };
-
     const mapContainerStyle = {
         width: '100%',
         height: '400px',
@@ -59,7 +43,7 @@ function AdminHomepage() {
     };
 
     const center = users.length > 0 ? 
-        { lat: parseFloat(users[0].captured_latitude), lng: parseFloat(users[0].captured_longitude) } : 
+        { lat: parseFloat(users[0].selected_latitude), lng: parseFloat(users[0].selected_longitude) } : 
         { lat: 3.1390, lng: 101.6869 };
 
     return (
@@ -72,7 +56,7 @@ function AdminHomepage() {
                 <section className={styles.card}>
                     <h2>Admin Actions</h2>
                     <div className={styles.actions}>
-                        <Link to="/manage-users" className={styles.actionButton}>Manage Users</Link>
+                        <Link to="/manageuser" className={styles.actionButton}>Manage Users</Link>
                         <Link to="/view-reports" className={styles.actionButton}>View Reports</Link>
                         <Link to="/settings" className={styles.actionButton}>Settings</Link>
                     </div>
@@ -80,7 +64,7 @@ function AdminHomepage() {
 
                 <section className={styles.card}>
                     <h2>User Locations</h2>
-                    <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+                    <LoadScript googleMapsApiKey="AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs">
                         <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
                             {users.map((user) => (
                                 <MarkerComponent key={user.id} user={user} />
@@ -101,7 +85,6 @@ function AdminHomepage() {
                                     <th>Location</th>
                                     <th>Status</th>
                                     <th>Shop Address</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -123,15 +106,9 @@ function AdminHomepage() {
                                                 ))
                                             ) : <span>No images</span>}
                                         </td>
-                                        <td>{user.captured_latitude}, {user.captured_longitude}</td>
+                                        <td>{user.selected_latitude}, {user.selected_longitude}</td>
                                         <td>{user.status}</td>
                                         <td>{user.selected_address}</td>
-                                        <td>
-                                            <button 
-                                                onClick={() => deleteUser(user.id)} 
-                                                className={`${styles.button} ${styles.deleteButton}`}
-                                            >Delete</button>
-                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

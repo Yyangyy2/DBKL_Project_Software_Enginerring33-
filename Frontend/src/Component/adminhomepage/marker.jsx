@@ -10,23 +10,24 @@ function MarkerComponent({ user }) {
         switch (status) {
             case 'GREEN':
                 return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-            case 'RED':
-                return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             case 'YELLOW':
                 return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-
+            case 'RED':
+                return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+            default:
+                return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'; // Default color
         }
     };
 
     return (
         <Marker
             position={{
-                lat: parseFloat(user.captured_latitude),
-                lng: parseFloat(user.captured_longitude),
+                lat: parseFloat(user.selected_latitude),
+                lng: parseFloat(user.selected_longitude),
             }}
             icon={getMarkerColor(user.status)} // Set marker color based on status
             onClick={() => setIsOpen(true)}
-            title={`User ID: ${user.id}`}
+            title={'User ID: ${user.id}'}
         >
             {isOpen && (
                 <InfoWindow onCloseClick={() => setIsOpen(false)}>
