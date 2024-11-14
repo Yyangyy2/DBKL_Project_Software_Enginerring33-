@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
-import {Link} from 'react-router-dom';
-
 
 const Camera = () => {
     const [imageDataUrl, setImageDataUrl] = useState('');
     const [comparisonResult, setComparisonResult] = useState('');
     const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [selectedLocation, setSelectedLocation] = useState({ latitude: null, longitude: null });
-    const [selectedAddress, setSelectedAddress] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [warningMessage, setWarningMessage] = useState('');
     const [statusColor, setStatusColor] = useState('');
@@ -66,7 +63,7 @@ const Camera = () => {
         }
     };
     
-    const saveLocationData = async (capturedLocation, selectedLocation, selectedAddress) => {
+    const saveLocationData = async (capturedLocation, selectedLocation) => {
         if (!capturedLocation || capturedLocation.latitude === null || capturedLocation.longitude === null) {
             console.error('Captured location is null. Please ensure location is captured before saving.');
             return;
@@ -84,7 +81,6 @@ const Camera = () => {
                     capturedLongitude: capturedLocation.longitude,
                     selectedLatitude: selectedLocation.latitude,
                     selectedLongitude: selectedLocation.longitude,
-                    selectedAddress: selectedAddress,
                 }),
             });
     
@@ -127,7 +123,7 @@ const Camera = () => {
         // Capture and save location only
         const locationData = await captureLocation();
         if (locationData) {
-            await saveLocationData(locationData, selectedLocation, selectedAddress);
+            await saveLocationData(locationData, selectedLocation);
         }
     };
     
@@ -181,24 +177,6 @@ const Camera = () => {
         }
     };
     
-    const fetchAddress = async (lat, lng) => {
-        try {
-            const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs`);
-            const data = await response.json();
-            console.log("Geocoding API response:", data);
-    
-            if (data.results && data.results[0]) {
-                const address = data.results[0].formatted_address;
-                setSelectedAddress(address);
-            } else {
-                setSelectedAddress('Address not found');
-            }
-        } catch (error) {
-            console.error('Error fetching address:', error);
-            setSelectedAddress('Error fetching address');
-        }
-    };
-    
 
     const isLocationMatch = (location1, location2, margin = 0.01) => {
         return (
@@ -248,46 +226,29 @@ const Camera = () => {
                 const lat = place.geometry.location.lat();
                 const lng = place.geometry.location.lng();
                 setSelectedLocation({ latitude: lat, longitude: lng });
-                fetchAddress(lat, lng);
-    
+
                 saveLocationData();
             }
         }
     };
-    
 
     const handleMapClick = (event) => {
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
         setSelectedLocation({ latitude: lat, longitude: lng });
-        fetchAddress(lat, lng); // Fetch address for the selected location
         setWarningMessage(''); // Clear any existing warning message
     };
 
-
     return (
         <div className="camera-container">
-            
             <h2>Capture Image from Camera</h2>
     
             <div className="content-wrapper">
                 {/* Camera and Capture Button */}
                 <div className="camera-section">
                     <video ref={videoRef} autoPlay className="camera-video" />
-                    <div class="button-container">
-
                     <button onClick={captureImage} className="camera-btn">Capture Image and Save Location</button>
-
-                    {warningMessage && (
-                    <div className="warning-message" style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>
-                        {warningMessage}
-                    </div>
-                )}
-    
                     <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-                    </div>
-
                 </div>
     
                 {/* Google Maps with Search and Click Selection */}
@@ -323,13 +284,19 @@ const Camera = () => {
                             <h3>Selected Location:</h3>
                             <p>Latitude: {selectedLocation.latitude}</p>
                             <p>Longitude: {selectedLocation.longitude}</p>
-                            <p>Address: {selectedAddress || 'Loading...'}</p>
                         </div>
             )}
                 </div>
 
             </div>
 
+            {/* Warning message at the bottom */}
+            {warningMessage && (
+                    <div className="warning-message" style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>
+                        {warningMessage}
+                    </div>
+                )}
+    
     
             {/* Display captured image and location info */}
             {imageDataUrl && (
@@ -365,12 +332,6 @@ const Camera = () => {
                 <div className={`status-indicator ${statusColor}`}>
                     <p>{statusColor.toUpperCase()}</p>
                     </div>
-            </div>
-
-            <div style={{background: '#007bff', borderRadius: '10px',
-                 width: '170px', padding:'10px', position: 'fixed', bottom: '0', right:'0'
-                 , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
-                <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Home</span></Link>
             </div>
 
         </div>
