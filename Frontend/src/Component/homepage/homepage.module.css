@@ -183,6 +183,14 @@ body{
 .color_primary{
     color: #3498db;
 }
+
+.btn_primary:disabled {
+    background-color: #ccc; /* Gray or any other color you prefer */
+    color: #666; /* Darker text color for contrast */
+    cursor: not-allowed; /* Shows that the button is disabled */
+    opacity: 0.6; /* Optional: make it slightly transparent */
+}
+
 /* bottom */
 .file_upload_container >.bottom{
     display: flex;

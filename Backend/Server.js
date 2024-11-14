@@ -146,7 +146,7 @@ try{
 
         // Create a JSON Web Token (JWT) that securely encodes the user's 
         //information (such as ID and email) and includes an expiration time.
-        const token = jwt.sign({ id: user.id, email: user.email || user.ic, userType: userType }, process.env.LOGIN_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email || user.ic, userType: userType }, process.env.LOGIN_KEY, { expiresIn: '4hr' });
 
           // Set the JWT in an HttpOnly cookie
           res.cookie('token', token, {
@@ -281,33 +281,41 @@ app.post('/logout',(req, res) =>{
         return res.json({ message: 'Logged out successfully' });
 });
 
-const uploadToImgBB = async (imageBase64) => {
-    try {
-        const form = new FormData();
-        form.append('key', process.env.IMGBB_API_KEY);
-        form.append('image', imageBase64); // Base64 string without prefixes
-
-        const response = await axios.post('https://api.imgbb.com/1/upload', form, {
-            headers: form.getHeaders(),
-            maxBodyLength: Infinity, // To handle large images
-        });
-
-        console.log('ImgBB Upload Response:', response.data);
-
-        if (response.data && response.data.success) {
-            console.log('Image uploaded to ImgBB successfully:', response.data.data.url);
-            return response.data.data.url;
-        } else {
-            console.error('ImgBB upload failed:', response.data);
-            return null;
+// Example backend endpoint to update upload attempt status
+app.post('/updateUploadAttempt', verifyToken, (req, res) => {
+    const userId = req.user.id;
+    const uploadAttemptId = req.body.uploadAttemptId;
+    // Assume you have a database connection here
+    db.query('UPDATE users SET upload_attempts = ? WHERE id = ?',[uploadAttemptId, userId], (err, result) => {
+        if (err) {
+            return res.status(500).send('Error updating upload attempt');
         }
-    } catch (uploadError) {
-        console.error('Error uploading to ImgBB:', uploadError.response ? uploadError.response.data : uploadError.message);
-        return null;
-    }
-};
+        res.status(200).send('Upload attempt updated successfully');
+    });
+});
 
+app.get('/getUploadAttempts', verifyToken, (req, res) => {
+    const userId = req.user.id;  
 
+    const query = 'SELECT upload_attempts FROM users WHERE id = ?';
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error in query', err);  
+            return res.status(500).json({ message: 'Error retrieving upload attempts', error: err });
+        }
+
+        console.log('Query result:', results);  // Log query result to see its structure
+
+        if (results && results.length > 0) {
+            // Handle null value for upload_attempts
+            const uploadAttempts = results[0].upload_attempts;
+            res.status(200).json({ uploadAttempts });
+        } else {
+            res.status(404).json({ message: 'No data found for this user' });
+        }
+    });
+});
 
 // Image Upload Endpoint
 app.post('/uploadImage', upload.single('file'), verifyToken, (req, res) => {
@@ -347,6 +355,32 @@ app.post('/uploadImage', upload.single('file'), verifyToken, (req, res) => {
         }
     });
 });
+
+const uploadToImgBB = async (imageBase64) => {
+    try {
+        const form = new FormData();
+        form.append('key', process.env.IMGBB_API_KEY);
+        form.append('image', imageBase64); // Base64 string without prefixes
+
+        const response = await axios.post('https://api.imgbb.com/1/upload', form, {
+            headers: form.getHeaders(),
+            maxBodyLength: Infinity, // To handle large images
+        });
+
+        console.log('ImgBB Upload Response:', response.data);
+
+        if (response.data && response.data.success) {
+            console.log('Image uploaded to ImgBB successfully:', response.data.data.url);
+            return response.data.data.url;
+        } else {
+            console.error('ImgBB upload failed:', response.data);
+            return null;
+        }
+    } catch (uploadError) {
+        console.error('Error uploading to ImgBB:', uploadError.response ? uploadError.response.data : uploadError.message);
+        return null;
+    }
+};
 
 // Compare Faces Endpoint
 app.post('/compareFaces', verifyToken, async (req, res) => {
@@ -519,8 +553,6 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Error updating status' });
     }
 });
-
-
 
 // Start the server
 const PORT = 8081;

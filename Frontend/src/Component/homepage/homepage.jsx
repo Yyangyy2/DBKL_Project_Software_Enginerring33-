@@ -1,7 +1,7 @@
 import styles from './homepage.module.css';
-import { Link, Navigate, useNavigate, useEffect } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 
-import { useRef, useState,  } from 'react';
+import { useRef, useState, useEffect} from 'react';
 
 //icons
 import { LiaTimesSolid } from "react-icons/lia";
@@ -12,7 +12,9 @@ import axios from 'axios';
 function Homepage() {
     const dialogRef = useRef(null);
     const [file, setFile] = useState(null); 
-    const [token, setToken] = useState(null);
+    const [remainingAttempts, setRemainingAttempts] = useState(null); // Track remaining upload attempts
+    const [token, setToken] = useState(null);   
+    const [isUploaded, setIsUploaded] = useState(false);
     const navigate = useNavigate();
 
     const openDialog = () => {
@@ -68,6 +70,7 @@ function Homepage() {
         const selectedFile = event.target.files[0];
         if (selectedFile && isNewFile(selectedFile) && isValidExtension(selectedFile) && isValidSize(selectedFile)) {
             setFile(selectedFile); // Update state to a single file
+            setIsUploaded(false); // Reset upload status
             console.log("Valid files selected:", selectedFile);
         }
         event.target.value = null; // clear an input
@@ -78,6 +81,7 @@ function Homepage() {
         const droppedFile = event.dataTransfer.files[0];
         if (droppedFile && isNewFile(droppedFile) && isValidExtension(droppedFile) && isValidSize(droppedFile)) {
             setFile(droppedFile); // Update state to a single file
+            setIsUploaded(false); // Reset upload status
             console.log("Files dropped:", droppedFile);
         }
         event.target.value = null; // clear an input
@@ -98,43 +102,83 @@ function Homepage() {
 
     const handleFileDelete = () => {
         setFile(null); // Reset file
+        setIsUploaded(false); // Reset upload status
     };
+
+    const fetchUploadAttempts = async () => {
+        try {
+            const response = await axios.get('http://localhost:8081/getUploadAttempts', {
+                withCredentials: true,
+            });
+    
+            if (response.status === 200) {
+                setRemainingAttempts(response.data.uploadAttempts);
+                setIsUploaded(false)
+            } else {
+                console.error('Failed to fetch upload attempts');
+            }
+        } catch (error) {
+            console.error('Error fetching upload attempts:', error);
+        }
+    };
+    
+    useEffect(() => {
+        fetchUploadAttempts(); // Check the upload attempts when the component mounts
+    }, []);
+
 
     const handleUpload = async () => {
-        if (file) {
-            // Directly call uploadFile with the file state
-            await uploadFile(file); 
-            setFile(null); // Clear the file state after upload sucessful
-            closeDialog(); // Close the dialog after upload
+        if (!file) {
+            alert('No file selected. Please select an image file to upload.');
+            return;
+        }
 
-        } else {
-            alert("No file selected. Please select an image file to upload.");
+        if(remainingAttempts > 0){
+            if(file){
+                await uploadFile(file);
+            }
+        }else{
+            window.confirm("No remaining upload attempts.");
+            setIsUploaded(true)
         }
     };
 
-    const uploadFile = async (file) =>{
+    const uploadFile = async (file) => {
         const formData = new FormData(); // Corrected the casing of FormData
-        formData.append('file', file);//append file object to form data
+        formData.append('file', file); // Append file object to form data
         formData.append('filename', file.name); // Add the filename to form data
-
-        try{
+    
+        try {
+            // Step 1: Upload the file
             const response = await axios.post('http://localhost:8081/uploadImage', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',  
+                    'Content-Type': 'multipart/form-data',
                 },
-                withCredentials: true // Ensure cookies, including the HTTP-only token, are sent
+                withCredentials: true, // Ensure cookies, including the HTTP-only token, are sent
             });
+    
+            if (response.status === 200) {
+                window.confirm(`${file.name} Upload Successful`);
+    
+                // Step 2: Update the database to set upload_attempts to false
+                // Call your backend to update the upload attempt status
+                await axios.post('http://localhost:8081/updateUploadAttempt', {}, {
+                    withCredentials: true, // Ensure cookies, including the HTTP-only token, are sent
+                });
+    
+                // Decrement remaining attempts and set the uploaded status
+                setRemainingAttempts((prev) => (prev - 1)); // Decrement remaining attempts
+                setIsUploaded(true); // Set to true after successful upload
+                setFile(null); // Reset file state
 
-            if(response.status === 200){
-                window.confirm(`${file.name} Upload Successful`)
-            }else{
-                alert(`${file.name} Uploaded Unsucessful, due to`, response.data);
+            } else {
+                alert(`${file.name} Upload Unsuccessful`);
             }
-            
-        }catch(error){
+        } catch (error) {
             alert(`Error Uploading File: ${error.message}`);
         }
-    }
+    };
+    
 
     //Handle logout
     const logout = async ()=>{
@@ -150,7 +194,6 @@ function Homepage() {
             }else{
                 alert('logout unsuccessfully!')
             }
-
         }catch(error){
             console.error("Logout error:", error);
             alert("Error logging out, please try again.");
@@ -164,39 +207,41 @@ function Homepage() {
             <button className={styles.main_btn} onClick={openDialog}>Upload Identity</button>
             <dialog ref={dialogRef} className={styles.uploadIdentityDialog}>
                 <div className={styles.file_upload_container}>
+
                     <div className={styles.top}>
-                        <h3 className={styles.title}>Upload Image</h3>
+                        <h3 className={styles.title}>Upload Photo</h3>
                     </div>
+                    <div>
+                        <h2 className={styles.description}>Remaining Attempts: {remainingAttempts}</h2>
+                    </div>
+
                     <div className={styles.middle}>
                         <label className={styles.file_drop_area} onDrop={handleFileDrop} onDragOver={handleFileDrop}>
                             <LuFilePlus2 className={styles.icon} />
                             <p className={styles.description}>Drop your image here <span className={styles.color_primary}>browse</span></p>
                             <p className={styles.text_muted}>Max. File Size 25 MB</p>
-                            <input type="file" onChange={handleFileInput} accept='.jpeg, .jpg, .png' />
+                            <input id='uploadFile' type="file" onChange={handleFileInput}  disabled={remainingAttempts <= 0} accept='.jpeg, .jpg, .png' />
                         </label>
                         <div className={styles.preview_area}>
                             {file && ( // Updated to check if file is defined
                                 <div className={styles.preview_card}>
                                     <div className={styles.column_avater}>
-                                        {isImage(file) ? <img src={URL.createObjectURL(file)} alt={file.name}/> : <BsFileEarmark />}
+                                    {isImage(file) ? <img src={URL.createObjectURL(file)} alt={file.name}/> :<BsFileEarmark/>}
                                     </div>
-
                                     <div className={styles.column}>
                                         <p className={styles.name}>{file.name}</p>
                                         <p className={styles.text_muted_size}>{fileSize(file.size)}</p>
                                     </div>
-
                                     <div className={styles.column_last}>
                                         <LiaTimesSolid className={styles.cancel_icon} onClick={handleFileDelete} />
                                     </div>
-
                                 </div>
                             )}
                         </div>
                     </div>
                     <div className={styles.bottom}>
                         <button id={styles.btn} onClick={closeDialog}>Cancel</button>
-                        <button className={styles.btn_primary} onClick={handleUpload}>Save</button>
+                        <button id="btn-upload" className={styles.btn_primary} onClick={handleUpload} disabled={remainingAttempts <= 0 || !file} >Save</button>
                     </div>
                 </div>
             </dialog>
