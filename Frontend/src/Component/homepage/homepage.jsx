@@ -212,14 +212,14 @@ function Homepage() {
                         <h3 className={styles.title}>Upload Photo</h3>
                     </div>
                     <div>
-                        <h2 className={styles.description}>Remaining Attempts: {remainingAttempts}</h2>
+                        <h2 className={styles.remaining_attempts}>Remaining Attempts: {remainingAttempts}</h2>
                     </div>
 
                     <div className={styles.middle}>
                         <label className={styles.file_drop_area} onDrop={handleFileDrop} onDragOver={handleFileDrop}>
                             <LuFilePlus2 className={styles.icon} />
                             <p className={styles.description}>Drop your image here <span className={styles.color_primary}>browse</span></p>
-                            <p className={styles.text_muted}>Max. File Size 25 MB</p>
+                            <p className={styles.text_muted}>Max. File Size 2 MB</p>
                             <input id='uploadFile' type="file" onChange={handleFileInput}  disabled={remainingAttempts <= 0} accept='.jpeg, .jpg, .png' />
                         </label>
                         <div className={styles.preview_area}>
