@@ -1,7 +1,9 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
 import {Link} from 'react-router-dom';
+
 
 const Camera = () => {
     const [imageDataUrl, setImageDataUrl] = useState('');
@@ -266,14 +268,27 @@ const Camera = () => {
 
     return (
         <div className="camera-container">
+            
             <h2>Capture Image from Camera</h2>
     
             <div className="content-wrapper">
                 {/* Camera and Capture Button */}
                 <div className="camera-section">
                     <video ref={videoRef} autoPlay className="camera-video" />
+                    <div class="button-container">
+
                     <button onClick={captureImage} className="camera-btn">Capture Image and Save Location</button>
+
+                    {warningMessage && (
+                    <div className="warning-message" style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>
+                        {warningMessage}
+                    </div>
+                )}
+    
                     <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+                    </div>
+
                 </div>
     
                 {/* Google Maps with Search and Click Selection */}
@@ -316,13 +331,6 @@ const Camera = () => {
 
             </div>
 
-            {/* Warning message at the bottom */}
-            {warningMessage && (
-                    <div className="warning-message" style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>
-                        {warningMessage}
-                    </div>
-                )}
-    
     
             {/* Display captured image and location info */}
             {imageDataUrl && (
@@ -363,7 +371,7 @@ const Camera = () => {
             <div style={{background: '#007bff', borderRadius: '10px',
                  width: '170px', padding:'10px', position: 'fixed', bottom: '0', right:'0'
                  , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
-                <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Homepage</span></Link>
+                <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Home</span></Link>
             </div>
 
         </div>

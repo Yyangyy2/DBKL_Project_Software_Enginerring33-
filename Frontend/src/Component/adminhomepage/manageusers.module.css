@@ -1,13 +1,19 @@
 .container {
+    background-image: url(https://images5.alphacoders.com/385/385448.jpg);    
     padding: 20px;
     font-family: Arial, sans-serif;
 }
 
-h1 {
-    color: #333;
-    font-size: 24px;
-    text-align: center;
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 40px;
+    color: #fff;
 }
 
 .card {
@@ -16,12 +22,13 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin: 0 auto;
-    max-width: 900px;
+    max-width: 100%;
     overflow: auto;
 }
 
 .userTableContainer {
-    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
     border-radius: 8px;
 }
 
@@ -35,19 +42,21 @@ h1 {
 
 .userTable {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
 .userTable th, .userTable td {
-    padding: 12px 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
     text-align: left;
-    border-bottom: 1px solid #ddd;
 }
 
 .userTable th {
-    background-color: #f4f4f4;
+    background-color: #f9f9f9;
     font-weight: bold;
+    font-size: 14px;
 }
 
 .userTable td {

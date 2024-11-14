@@ -536,9 +536,9 @@ app.get('/users', (req, res) => {
 });
 
 
-//////////////////////////////
+//////////////////////////////// Delete user route
 
-// Delete user route
+
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
     const deleteQuery = 'DELETE FROM users WHERE id = ?';
@@ -556,6 +556,37 @@ app.delete('/users/:id', (req, res) => {
         res.json({ message: 'User deleted successfully' });
     });
 });
+
+//////////////////////////////// Edit user route
+app.put('/users/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const { ic, status, selected_address, selected_latitude, selected_longitude } = req.body;
+
+    db.query(
+        `UPDATE users SET ic = ?, status = ?, selected_address = ?, selected_latitude = ?, selected_longitude = ? WHERE id = ?`, 
+        [ic, status, selected_address, selected_latitude, selected_longitude, userId],
+        (err, updateResult) => {
+            if (err) {
+                console.error('Error updating user:', err);
+                return res.status(500).json({ error: 'Failed to update user' });
+            }
+
+            db.query(`SELECT * FROM users WHERE id = ?`, [userId], (err, results) => {
+                if (err) {
+                    console.error('Error retrieving updated user:', err);
+                    return res.status(500).json({ error: 'Failed to retrieve updated user' });
+                }
+                if (results.length === 0) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+                const updatedUser = results[0];
+                res.status(200).json(updatedUser);
+            });
+        }
+    );
+});
+
+
 
 // Start the server
 const PORT = 8081;

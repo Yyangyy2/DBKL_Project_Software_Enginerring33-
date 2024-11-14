@@ -10,6 +10,10 @@ function ManageUsers() {
     const [search, setSearch] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [message, setMessage] = useState('');
+    const [showEditConfirmation, setShowEditConfirmation] = useState(false);
+    const [userToSave, setUserToSave] = useState(null);
+    const [updateCounter, setUpdateCounter] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,7 +21,12 @@ function ManageUsers() {
             try {
                 const response = await axios.get('http://localhost:8081/users');
                 if (response.status === 200) {
-                    setUsers(response.data);
+                    // Convert user IDs to numbers
+                    const usersWithNumericIds = response.data.map(user => ({
+                        ...user,
+                        id: Number(user.id)
+                    }));
+                    setUsers(usersWithNumericIds);
                 }
             } catch (error) {
                 console.error("Error fetching users:", error);
@@ -25,6 +34,7 @@ function ManageUsers() {
         };
         fetchUsers();
     }, []);
+    
 
     const deleteUser = async () => {
         try {
@@ -38,32 +48,61 @@ function ManageUsers() {
     };
 
     const editUser = (userId) => {
-        setEditingUserId(userId);
-        const user = users.find(user => user.id === userId);
-        setEditData({
-            ic: user.ic,
-            status: user.status,
-            selected_address: user.selected_address,
-            selected_latitude: user.selected_latitude,
-            selected_longitude: user.selected_longitude
-        });
+        setEditingUserId(Number(userId));
+        const user = users.find(user => user.id === Number(userId));
+        if (user) {
+            setEditData({
+                ic: user.ic,
+                status: user.status,
+                selected_address: user.selected_address,
+                selected_latitude: user.selected_latitude,
+                selected_longitude: user.selected_longitude
+            });
+        }
     };
+    
 
-    const saveUser = async (userId) => {
+    const confirmSaveUser = (userId) => {
+        setUserToSave(Number(userId));
+        setShowEditConfirmation(true);
+    };
+    
+
+    const saveUser = async () => {
         try {
-            const response = await axios.put(`http://localhost:8081/users/${userId}`, editData);
+            console.log("Save function called for user ID:", userToSave);
+            console.log("Edit data to save:", editData);
+    
+            const response = await axios.put(`http://localhost:8081/users/${userToSave}`, editData);
+    
             if (response.status === 200) {
-                setUsers(users.map(user => (user.id === userId ? response.data : user)));
-                setEditingUserId(null);
+                const updatedUser = response.data;
+    
+                setUsers(prevUsers => 
+                    prevUsers.map(user => (user.id === userToSave ? updatedUser : user))
+                );
+    
+                setEditingUserId(null); 
+                setEditData({});
+                setShowEditConfirmation(false);
+                setUserToSave(null);
+    
+                setMessage('User information saved successfully!');
+                setTimeout(() => setMessage(''), 3000);
+            } else {
+                console.error("Unexpected response:", response);
             }
         } catch (error) {
             console.error("Error saving user:", error);
         }
     };
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEditData(prev => ({ ...prev, [name]: value }));
+        if (name in editData) {
+            setEditData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const goBack = () => {
@@ -86,8 +125,11 @@ function ManageUsers() {
 
     return (
         <div className={styles.container}>
-            <button onClick={goBack} className={styles.backButton}>Back</button>
-            <h1>Manage Users</h1>
+            <header className={styles.header}>
+                <h1>Manage Users</h1>
+                <button onClick={goBack} className={styles.backButton}>Back</button>
+            </header>
+            {message && <p className={styles.message}>{message}</p>}
             <input
                 type="text"
                 className={styles.searchBar}
@@ -188,7 +230,7 @@ function ManageUsers() {
                                         <td>
                                             {editingUserId === user.id ? (
                                                 <>
-                                                    <button onClick={() => saveUser(user.id)} className={`${styles.button} ${styles.saveButton}`}>Save</button>
+                                                    <button onClick={() => confirmSaveUser(user.id)} className={`${styles.button} ${styles.saveButton}`}>Save</button>
                                                     <button onClick={() => setEditingUserId(null)} className={`${styles.button} ${styles.cancelButton}`}>Cancel</button>
                                                 </>
                                             ) : (
@@ -212,6 +254,17 @@ function ManageUsers() {
                         <div className={styles.modalButtons}>
                             <button onClick={deleteUser} className={`${styles.button} ${styles.deleteButton}`}>Yes</button>
                             <button onClick={() => setShowModal(false)} className={`${styles.button} ${styles.cancelButton}`}>No</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showEditConfirmation && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <p>Are you sure you want to save changes for this user?</p>
+                        <div className={styles.modalButtons}>
+                            <button onClick={saveUser} className={`${styles.button} ${styles.saveButton}`}>Yes</button>
+                            <button onClick={() => setShowEditConfirmation(false)} className={`${styles.button} ${styles.cancelButton}`}>No</button>
                         </div>
                     </div>
                 </div>

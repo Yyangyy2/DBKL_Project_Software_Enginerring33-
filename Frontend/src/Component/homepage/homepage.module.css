@@ -1,4 +1,4 @@
-*{
+*{    
     padding: 0;
     margin: 0;
     border: 0;
@@ -6,6 +6,7 @@
 }
 
 body{
+    background-image: url(https://images3.alphacoders.com/102/1021879.jpg);   
     width: 100vw;
     height: 100vh;
     overflow: hidden;
@@ -173,6 +174,9 @@ body{
     color: #000;
 }
 
+.remaining_attempts{
+    color: rgb(255, 0, 0)
+}
 
 .text_muted{
     color: #000;
@@ -213,7 +217,7 @@ h3{
     color: white;
     font-size: 14px;
     font-weight: 500;
-    border-radius: 53px;
+    border-radius: 8px;
     cursor: pointer;
     display: block;
     width: 53%;
@@ -244,6 +248,12 @@ h3{
     font-weight: 500;
     transition: ease-in-out .3s
 }
+.btn_primary:disabled {
+    background-color: #ccc; /* Gray or any other color you prefer */
+    color: #666; /* Darker text color for contrast */
+    cursor: not-allowed; /* Shows that the button is disabled */
+    opacity: 0.6; /* Optional: make it slightly transparent */
+}
 
 /* Center container */
 .center_container{
@@ -257,10 +267,10 @@ h3{
     transform: translate(-50%, -50%); 
     height: 500px; /* Centers vertically */
     gap: 20px;
-    border-radius: 30px;
+    border-radius: 8px;
     width: 500px;
     border: 3px groove rgba(128, 128, 128, 0.311) ;
-    background-color: #5a5a5a;
+    background-color: #fff;
     backdrop-filter: blur(10px);
     box-shadow: inset 1px 1px 6px rgba(255, 255, 255, .3), 2px 2px 15px rgba(0, 0, 0, .5);
 }
@@ -269,9 +279,10 @@ h3{
 .center_container button {
     padding: 20px 40px; /* Increase size */
     font-size: 18px;
-    border-radius: 30px;
+    border-radius: 8px;
+
     cursor: pointer;
-    background-color: #3498db;
+    background-color: #007bff;
     color: white;
     text-align: center;
     width: 250px; /* Fixed width for consistency */
@@ -282,13 +293,33 @@ h3{
 }
 
 .main_btn:hover {
-    background-color: rgba(255, 255, 255, .8);
-    color: #000;
-    transition:.5s ease-in;
+    background-color: rgba(52, 152, 219, .5);
+    color:rgba(0, 0, 0, .5);
+    font-weight: 500;
+    transition: ease-in-out .3s
 }
 
 /* Link inside buttons */
 .center_container button a {
     color: inherit;
     text-decoration: none;
+}
+
+.uploadedImageContainer {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.uploadedImage {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.actionButtons {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: center; /* Center align buttons */
+    gap: 10px; /* Space between buttons */
 }
