@@ -1,4 +1,4 @@
-// File: ./Component/adminhomepage/AdminHomepage.jsx
+// File: ./Component/adminhomepage/AdminHomepage.jsx 
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -59,7 +59,7 @@ function AdminHomepage() {
     };
 
     const center = users.length > 0 ? 
-        { lat: parseFloat(users[0].captured_latitude), lng: parseFloat(users[0].captured_longitude) } : 
+        { lat: parseFloat(users[0].selected_latitude), lng: parseFloat(users[0].selected_longitude) } : 
         { lat: 3.1390, lng: 101.6869 };
 
     return (
@@ -80,7 +80,7 @@ function AdminHomepage() {
 
                 <section className={styles.card}>
                     <h2>User Locations</h2>
-                    <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+                    <LoadScript googleMapsApiKey="AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs">
                         <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
                             {users.map((user) => (
                                 <MarkerComponent key={user.id} user={user} />
@@ -123,7 +123,7 @@ function AdminHomepage() {
                                                 ))
                                             ) : <span>No images</span>}
                                         </td>
-                                        <td>{user.captured_latitude}, {user.captured_longitude}</td>
+                                        <td>{user.selected_latitude}, {user.selected_longitude}</td>
                                         <td>{user.status}</td>
                                         <td>{user.selected_address}</td>
                                         <td>
