@@ -560,7 +560,7 @@ app.post('/saveLocation', verifyToken, async (req, res) => {
 
 
 
-///////////////////////////////////////////////////////////////////////Endpoint to save status in the users table///////////////////////////////////
+///////////////////////////////////////Endpoint to save status in the users table///////////////////////////////////
 app.post('/saveStatus', verifyToken, async (req, res) => {
     const { status } = req.body;
     const userId = req.user.id;  // userId is obtained from the token
@@ -604,7 +604,9 @@ app.get('/users', (req, res) => {
 });
 
 
-//////////////////////////////////////////////////////////////////Delete user route////////////////////////////////////////////////////////////
+//////////////////////////////
+
+// Delete user route
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
     const deleteQuery = 'DELETE FROM users WHERE id = ?';
