@@ -1,55 +1,50 @@
-/* File: ./Component/adminhomepage/adminhomepage.module.css */
-
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 20px;
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fa;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    max-width: 800px;
+    align-items: center;
     margin-bottom: 20px;
 }
 
 .header h1 {
-    font-size: 24px;
+    font-size: 28px;
     color: #333;
+}
+
+.button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #0056b3;
 }
 
 .logoutButton {
     background-color: #ff5c5c;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.logoutButton:hover {
-    background-color: #ff3b3b;
 }
 
 .main {
-    width: 100%;
-    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.section {
-    background-color: #f9f9f9;
-    border-radius: 10px;
+.card {
+    background-color: #ffffff;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.section h2 {
-    margin-top: 0;
-    color: #333;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .actions {
@@ -61,12 +56,11 @@
     flex: 1;
     background-color: #007bff;
     color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 5px;
+    padding: 10px 15px;
+    border-radius: 8px;
     text-align: center;
-    cursor: pointer;
     font-size: 16px;
+    transition: background-color 0.3s;
     text-decoration: none;
 }
 
@@ -74,75 +68,67 @@
     background-color: #0056b3;
 }
 
-.actionButton a {
-    color: #fff;
-    text-decoration: none;
-}
-
-/* Updated userTable styles */
 .userTable {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Ensures even column widths */
     margin-top: 20px;
-    overflow-x: auto;
 }
 
-.userTable th,
-.userTable td {
-    padding: 8px 12px;
+.userTable th, .userTable td {
+    padding: 10px;
     border: 1px solid #ddd;
     text-align: left;
-    word-wrap: break-word;
 }
 
 .userTable th {
-    background-color: #f4f4f4;
+    background-color: #f9f9f9;
     font-weight: bold;
     font-size: 14px;
 }
 
-.userTable td {
+.deleteButton {
+    background-color: #dc3545;
+}
+
+.deleteButton:hover {
+    background-color: #b32a36;
+}
+
+@media (max-width: 768px) {
+    .userTable {
+        overflow-x: auto;
+    }
+}
+
+/* Other styles remain the same */
+
+.userTableContainer {
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.userTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.userTable th, .userTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.userTable th {
+    background-color: #f9f9f9;
+    font-weight: bold;
     font-size: 14px;
 }
 
-/* Styling for action buttons within the table */
-.userTable .tableActionButton {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    margin: 0 3px;
-    display: inline-block;
-}
-
-.userTable .tableActionButton:hover {
-    background-color: #0056b3;
-}
-
-.userTable img {
-    max-width: 50px;
-    max-height: 50px;
-    border-radius: 4px;
-}
-
-/* Add horizontal scrolling for smaller screens */
 @media (max-width: 768px) {
-    .userTable {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    .userTable th,
-    .userTable td {
-        font-size: 12px;
-    }
-
-    .actionButton {
-        font-size: 14px;
+    .userTableContainer {
+        max-height: 300px;
     }
 }
