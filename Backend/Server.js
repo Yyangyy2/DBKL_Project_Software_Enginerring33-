@@ -587,6 +587,44 @@ app.put('/users/:userId', (req, res) => {
 });
 
 
+///////////////////////////////////////////////////////////// update upload attempt status/////////////////////////////////////////////////////////
+app.post('/updateUploadAttempt', verifyToken, (req, res) => {
+    const userId = req.user.id;
+    const uploadAttemptId = req.body.uploadAttemptId;
+    // Assume you have a database connection here
+    db.query('UPDATE users SET upload_attempts = ? WHERE id = ?',[uploadAttemptId, userId], (err, result) => {
+        if (err) {
+            return res.status(500).send('Error updating upload attempt');
+        }
+        res.status(200).send('Upload attempt updated successfully');
+    });
+});
+
+//////////////////////////////////////////////////////////////////fetch upload attempts/////////////////////////////////////////////////////////////
+app.get('/getUploadAttempts', verifyToken, (req, res) => {
+    const userId = req.user.id;  
+
+    const query = 'SELECT upload_attempts FROM users WHERE id = ?';
+
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Error in query', err);  
+            return res.status(500).json({ message: 'Error retrieving upload attempts', error: err });
+        }
+
+        console.log('Query result:', results);  // Log query result to see its structure
+
+        if (results && results.length > 0) {
+            // Handle null value for upload_attempts
+            const uploadAttempts = results[0].upload_attempts;
+            res.status(200).json({ uploadAttempts });
+        } else {
+            res.status(404).json({ message: 'No data found for this user' });
+        }
+    });
+});
+
+
 
 // Start the server
 const PORT = 8081;
