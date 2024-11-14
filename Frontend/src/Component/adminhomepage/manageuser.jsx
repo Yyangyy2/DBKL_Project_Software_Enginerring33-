@@ -48,8 +48,13 @@ function ManageUsers() {
     };
 
     const editUser = (userId) => {
+<<<<<<< HEAD
         setEditingUserId(Number(userId));
         const user = users.find(user => user.id === Number(userId));
+=======
+        setEditingUserId(userId);
+        const user = users.find(user => user.id === userId);
+>>>>>>> 7b94f2fe4c70cd6b87607c2dbbc8a517b78a1dff
         if (user) {
             setEditData({
                 ic: user.ic,
@@ -70,6 +75,7 @@ function ManageUsers() {
 
     const saveUser = async () => {
         try {
+<<<<<<< HEAD
             console.log("Save function called for user ID:", userToSave);
             console.log("Edit data to save:", editData);
     
@@ -89,6 +95,26 @@ function ManageUsers() {
     
                 setMessage('User information saved successfully!');
                 setTimeout(() => setMessage(''), 3000);
+=======
+            // Log the editData and URL to confirm data being sent
+            console.log("Saving user with ID:", userId);
+            console.log("Data being sent:", editData);
+    
+            const response = await axios.put(`http://localhost:8081/users/${userId}`, editData);
+            
+            if (response.status === 200) {
+                // Log to confirm successful response
+                console.log("User updated successfully:", response.data);
+                
+                // Update the user in the local state
+                setUsers(prevUsers => 
+                    prevUsers.map(user => (user.id === userId ? { ...user, ...editData } : user))
+                );
+    
+                // Reset edit mode
+                setEditingUserId(null);
+                setEditData({});
+>>>>>>> 7b94f2fe4c70cd6b87607c2dbbc8a517b78a1dff
             } else {
                 console.error("Unexpected response:", response);
             }
