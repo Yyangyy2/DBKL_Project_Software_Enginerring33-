@@ -1,22 +1,19 @@
-// adminhomepage.jsx
-
-import React, { useEffect, useState } from 'react';
+// File: ./Component/adminhomepage/AdminHomepage.js
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import MarkerComponent from './marker';
+import { GoogleMap, useLoadScript } from '@react-google-maps/api';
 import styles from './adminhomepage.module.css';
 
 function AdminHomepage() {
     const navigate = useNavigate();
-    const [token, setToken] = useState(null);
     const [users, setUsers] = useState([]);
-    const [isMapLoaded, setIsMapLoaded] = useState(false);
+    const [mapInstance, setMapInstance] = useState(null); // State to store map instance
+    const markersRef = useRef([]); // Reference to store marker instances
 
-    useEffect(() => {
-        const savedToken = localStorage.getItem('token');
-        if (savedToken) setToken(savedToken);
-    }, []);
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey: "AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs", // Replace with your actual Google Maps API Key
+    });
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -44,56 +41,115 @@ function AdminHomepage() {
         }
     };
 
-    const deleteUser = async (userId) => {
-        try {
-            await axios.delete(`http://localhost:8081/users/${userId}`);
-            setUsers(users.filter(user => user.id !== userId));
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
-    };
-
     const mapContainerStyle = {
         width: '100%',
         height: '400px',
         borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     };
 
-    const center = users.length > 0 ? 
-        { lat: parseFloat(users[0].selected_latitude), lng: parseFloat(users[0].selected_longitude) } : 
-        { lat: 3.1390, lng: 101.6869 };
+    const center = users.length > 0
+        ? {
+              lat: parseFloat(users[0].selected_latitude),
+              lng: parseFloat(users[0].selected_longitude),
+          }
+        : { lat: 3.1390, lng: 101.6869 }; // Default center location if no users are available
+
+    const onMapLoad = (map) => {
+        setMapInstance(map); // Store map instance
+    };
+
+    // Function to determine marker icon based on user status
+    const getMarkerIcon = (status) => {
+        switch (status) {
+            case 'GREEN':
+                return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+            case 'YELLOW':
+                return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+            case 'RED':
+                return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+            default:
+                return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+        }
+    };
+
+    // useEffect to add markers when mapInstance and users are ready
+    useEffect(() => {
+        if (mapInstance && users.length > 0) {
+            // Clear existing markers to avoid duplicates
+            markersRef.current.forEach(marker => marker.setMap(null));
+            markersRef.current = [];
+
+            // Add a new marker for each user
+            users.forEach((user) => {
+                const lat = parseFloat(user.selected_latitude);
+                const lng = parseFloat(user.selected_longitude);
+
+                // Validate coordinates
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn(`Invalid coordinates for user ID ${user.id}`);
+                    return;
+                }
+
+                const position = { lat, lng };
+
+                const marker = new window.google.maps.Marker({
+                    position,
+                    map: mapInstance,
+                    icon: getMarkerIcon(user.status),
+                    title: `User ID: ${user.id}`,
+                });
+
+                const infoWindow = new window.google.maps.InfoWindow({
+                    content: `
+                        <div style="max-width: 200px; font-size: 14px; color: #333;">
+                            <h3 style="font-size: 16px; margin: 0 0 5px;">User ID: ${user.id}</h3>
+                            <p>Status: ${user.status}</p>
+                            <p>Address: ${user.selected_address}</p>
+                            <p>Lat: ${user.selected_latitude}</p>
+                            <p>Lng: ${user.selected_longitude}</p>
+                        </div>
+                    `,
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(mapInstance, marker);
+                });
+
+                markersRef.current.push(marker);
+            });
+        }
+    }, [mapInstance, users]); // Run when mapInstance or users change
+
+    if (!isLoaded) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1>Admin Dashboard</h1>
-                <button onClick={logout} className={`${styles.button} ${styles.logoutButton}`}>Logout</button>
+                
             </header>
             <main className={styles.main}>
                 <section className={styles.card}>
                     <h2>Admin Actions</h2>
                     <div className={styles.actions}>
-                        <Link to="/manage-users" className={styles.actionButton}>Manage Users</Link>
+                        <Link to="/manageuser" className={styles.actionButton}>Manage Users</Link>
                         <Link to="/view-reports" className={styles.actionButton}>View Reports</Link>
                         <Link to="/settings" className={styles.actionButton}>Settings</Link>
+                        <button onClick={logout} className={`${styles.button} ${styles.logoutButton}`}>Logout</button>
                     </div>
                 </section>
 
                 <section className={styles.card}>
                     <h2>User Locations</h2>
-                    <LoadScript googleMapsApiKey="AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs">
-                        <GoogleMap 
-                            mapContainerStyle={mapContainerStyle} 
-                            center={center} 
-                            zoom={10}
-                            onLoad={() => setIsMapLoaded(true)}
-                        >
-                            {isMapLoaded && users.map((user) => (
-                                <MarkerComponent key={user.id} user={user} />
-                            ))}
-                        </GoogleMap>
-                    </LoadScript>
+                    <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        center={center}
+                        zoom={10}
+                        onLoad={onMapLoad}
+                    />
                 </section>
 
                 <section className={styles.card}>
@@ -108,7 +164,6 @@ function AdminHomepage() {
                                     <th>Location</th>
                                     <th>Status</th>
                                     <th>Shop Address</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -133,12 +188,6 @@ function AdminHomepage() {
                                         <td>{user.selected_latitude}, {user.selected_longitude}</td>
                                         <td>{user.status}</td>
                                         <td>{user.selected_address}</td>
-                                        <td>
-                                            <button 
-                                                onClick={() => deleteUser(user.id)} 
-                                                className={`${styles.button} ${styles.deleteButton}`}
-                                            >Delete</button>
-                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

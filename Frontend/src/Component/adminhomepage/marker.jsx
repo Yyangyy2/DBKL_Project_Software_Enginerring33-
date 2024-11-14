@@ -1,6 +1,6 @@
-// File: ./Component/adminhomepage/Marker.js
 import React, { useState } from 'react';
 import { Marker, InfoWindow } from '@react-google-maps/api';
+
 
 function MarkerComponent({ user }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,11 +11,11 @@ function MarkerComponent({ user }) {
             case 'GREEN':
                 return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
             case 'YELLOW':
-                return 'http://maps.google.com/mapfiles/ms/icons/-dot.png';
+                return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
             case 'RED':
                 return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             default:
-                return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'; // Default color
+                return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
         }
     };
 
@@ -25,9 +25,9 @@ function MarkerComponent({ user }) {
                 lat: parseFloat(user.selected_latitude),
                 lng: parseFloat(user.selected_longitude),
             }}
-            icon={getMarkerColor(user.status)} // Set marker color based on status
+            icon={getMarkerColor(user.status)}
             onClick={() => setIsOpen(true)}
-            title={'User ID: ${user.id}'}
+            title={`User ID: ${user.id}`} // Corrected template literal
         >
             {isOpen && (
                 <InfoWindow onCloseClick={() => setIsOpen(false)}>

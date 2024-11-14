@@ -305,67 +305,6 @@ const uploadToImgBB = async (imageBase64) => {
     }
 };
 
-// Route to get uploaded image
-app.get('/getUploadedImage', verifyToken, async (req, res) => {
-    try {
-        // Retrieve the user ID from the verified token in the request object
-        const userId = req.userId;
-        
-        if (!userId) {
-            console.error("User ID not provided in request.");
-            return res.status(400).json({ error: 'User ID not found in request' });
-        }
-
-        // Database query to fetch user image
-        const query = 'SELECT images FROM users WHERE id = ?';
-        console.log("Executing query for userId:", userId);
-
-        db.query(query, [userId], (err, results) => {
-            if (err) {
-                console.error('Database query error:', err.message); // Log database errors
-                return res.status(500).json({ error: 'Database query error' });
-            }
-            if (results.length === 0 || !results[0].images) {
-                console.log('No image found for userId:', userId);
-                return res.status(404).json({ error: 'No image found' });
-            }
-
-            console.log('Image found:', results[0]);
-
-            // Extract and validate base64 data
-            const base64Data = results[0].images.includes(';base64,') 
-                ? results[0].images.split(';base64,').pop() 
-                : results[0].images;
-            
-            if (!base64Data) {
-                console.error("Invalid image format in database for userId:", userId);
-                return res.status(500).json({ error: 'Invalid image format in database' });
-            }
-
-            // Convert the base64 image to a buffer
-            let imageBuffer;
-            try {
-                imageBuffer = Buffer.from(base64Data, 'base64');
-            } catch (conversionError) {
-                console.error("Error converting base64 data for userId:", userId, conversionError.message);
-                return res.status(500).json({ error: 'Error processing image data' });
-            }
-
-            // Set the appropriate headers for image response
-            res.setHeader('Content-Type', 'image/jpeg');
-            res.setHeader('Content-Disposition', 'inline; filename="uploadedImage.jpg"');
-
-            // Send the image buffer as a JPEG
-            res.send(imageBuffer);
-        });
-        
-    } catch (error) {
-        console.error("Error retrieving image:", error.message);
-        res.status(500).json({ error: 'Error retrieving image' });
-    }
-});
-
-
 
 
 // Image Upload Endpoint
@@ -579,19 +518,7 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
     }
 });
 
-// Define a route to fetch data (example: fetching all users)
-app.get('/users', (req, res) => {
-    const query = 'SELECT * FROM users';
-    db.query(query, (error, results) => {
-        if (error) {
-            console.error('Error retrieving users:', error);
-            res.status(500).json({ error: 'Failed to retrieve users' });
-        } else {
-            res.json(results);
-            console.log(`result: ${results}`)
-        }
-    });
-});    
+    
 /////////////////////////////////////RETRIVE USERS DATABASE INTO ADMIN//////////////////////////////////
 
 // Define a route to fetch data (example: fetching all users)
@@ -609,9 +536,9 @@ app.get('/users', (req, res) => {
 });
 
 
-//////////////////////////////
+//////////////////////////////// Delete user route
 
-// Delete user route
+
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
     const deleteQuery = 'DELETE FROM users WHERE id = ?';
@@ -629,6 +556,37 @@ app.delete('/users/:id', (req, res) => {
         res.json({ message: 'User deleted successfully' });
     });
 });
+
+//////////////////////////////// Edit user route
+app.put('/users/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const { ic, status, selected_address, selected_latitude, selected_longitude } = req.body;
+
+    db.query(
+        `UPDATE users SET ic = ?, status = ?, selected_address = ?, selected_latitude = ?, selected_longitude = ? WHERE id = ?`, 
+        [ic, status, selected_address, selected_latitude, selected_longitude, userId],
+        (err, updateResult) => {
+            if (err) {
+                console.error('Error updating user:', err);
+                return res.status(500).json({ error: 'Failed to update user' });
+            }
+
+            db.query(`SELECT * FROM users WHERE id = ?`, [userId], (err, results) => {
+                if (err) {
+                    console.error('Error retrieving updated user:', err);
+                    return res.status(500).json({ error: 'Failed to retrieve updated user' });
+                }
+                if (results.length === 0) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+                const updatedUser = results[0];
+                res.status(200).json(updatedUser);
+            });
+        }
+    );
+});
+
+
 
 // Start the server
 const PORT = 8081;
