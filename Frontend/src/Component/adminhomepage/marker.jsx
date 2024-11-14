@@ -11,7 +11,7 @@ function MarkerComponent({ user }) {
             case 'GREEN':
                 return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
             case 'YELLOW':
-                return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                return 'http://maps.google.com/mapfiles/ms/icons/-dot.png';
             case 'RED':
                 return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             default:

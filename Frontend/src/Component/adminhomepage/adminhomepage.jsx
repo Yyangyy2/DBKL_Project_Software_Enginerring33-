@@ -1,4 +1,5 @@
-// File: ./Component/adminhomepage/AdminHomepage.jsx 
+// adminhomepage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,6 +11,7 @@ function AdminHomepage() {
     const navigate = useNavigate();
     const [token, setToken] = useState(null);
     const [users, setUsers] = useState([]);
+    const [isMapLoaded, setIsMapLoaded] = useState(false);
 
     useEffect(() => {
         const savedToken = localStorage.getItem('token');
@@ -81,8 +83,13 @@ function AdminHomepage() {
                 <section className={styles.card}>
                     <h2>User Locations</h2>
                     <LoadScript googleMapsApiKey="AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs">
-                        <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
-                            {users.map((user) => (
+                        <GoogleMap 
+                            mapContainerStyle={mapContainerStyle} 
+                            center={center} 
+                            zoom={10}
+                            onLoad={() => setIsMapLoaded(true)}
+                        >
+                            {isMapLoaded && users.map((user) => (
                                 <MarkerComponent key={user.id} user={user} />
                             ))}
                         </GoogleMap>
