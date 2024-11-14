@@ -1,8 +1,7 @@
-// File: ./Component/adminhomepage/adminhomepage.js
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import styles from './adminhomepage.module.css';
 
 function AdminHomepage() {
@@ -54,20 +53,14 @@ function AdminHomepage() {
         }
     };
 
-    // Delete user function
-    const deleteUser = async (userId) => {
-        try {
-            const response = await axios.delete(`http://localhost:8081/users/${userId}`);
-            if (response.status === 200) {
-                alert("User deleted successfully");
-                setUsers(users.filter(user => user.id !== userId)); // Remove deleted user from state
-            } else {
-                console.error("Failed to delete user");
-            }
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            alert("Error deleting user, please try again.");
-        }
+    const mapContainerStyle = {
+        width: '100%',
+        height: '400px',
+    };
+
+    const center = {
+        lat: 3.1390, // Example latitude for center of map
+        lng: 101.6869, // Example longitude for center of map
     };
 
     return (
@@ -89,6 +82,19 @@ function AdminHomepage() {
                 </section>
 
                 <section className={styles.section}>
+                    <h2>Map</h2>
+                    <LoadScript googleMapsApiKey="AIzaSyBuPum0hFde7ZQLB6arVJ0F2EQJfmPv0Rs" libraries={['places']}>
+                        <GoogleMap
+                            mapContainerStyle={mapContainerStyle}
+                            center={center}
+                            zoom={10}
+                        >
+                            {/* Add markers or other map elements here */}
+                        </GoogleMap>
+                    </LoadScript>
+                </section>
+
+                <section className={styles.section}>
                     <h2>User Database</h2>
                     {users.length > 0 ? (
                         <table className={styles.userTable}>
@@ -103,7 +109,6 @@ function AdminHomepage() {
                                     <th>Selected Longitude</th>
                                     <th>Status</th>
                                     <th>Shop Address</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,7 +121,7 @@ function AdminHomepage() {
                                                 user.images.map((image, index) => (
                                                     <img
                                                         key={index}
-                                                        src={image.startsWith('data:image') ? image : `data:image/jpeg;base64,${image}`}
+                                                        src={image}
                                                         alt="User"
                                                         width="50"
                                                         height="50"
@@ -133,9 +138,6 @@ function AdminHomepage() {
                                         <td>{user.selected_longitude}</td>
                                         <td>{user.status}</td>
                                         <td>{user.selected_address}</td>
-                                        <td>
-                                            <button onClick={() => deleteUser(user.id)}>Delete</button>
-                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

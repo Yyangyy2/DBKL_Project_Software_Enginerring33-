@@ -1,8 +1,3 @@
-export const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email pattern
-    return emailRegex.test(email);
-};
-
 export const isValidIC = (ic) =>{
     // Regular expression to validate Malaysian IC format: YYMMDD-SSS3
     // Basic IC pattern (12 digits + hyphen)
