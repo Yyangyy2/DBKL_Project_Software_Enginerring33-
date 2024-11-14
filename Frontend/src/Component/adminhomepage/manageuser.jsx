@@ -40,30 +40,51 @@ function ManageUsers() {
     const editUser = (userId) => {
         setEditingUserId(userId);
         const user = users.find(user => user.id === userId);
-        setEditData({
-            ic: user.ic,
-            status: user.status,
-            selected_address: user.selected_address,
-            selected_latitude: user.selected_latitude,
-            selected_longitude: user.selected_longitude
-        });
+        if (user) {
+            setEditData({
+                ic: user.ic,
+                status: user.status,
+                selected_address: user.selected_address,
+                selected_latitude: user.selected_latitude,
+                selected_longitude: user.selected_longitude
+            });
+        }
     };
 
     const saveUser = async (userId) => {
         try {
+            // Log the editData and URL to confirm data being sent
+            console.log("Saving user with ID:", userId);
+            console.log("Data being sent:", editData);
+    
             const response = await axios.put(`http://localhost:8081/users/${userId}`, editData);
+            
             if (response.status === 200) {
-                setUsers(users.map(user => (user.id === userId ? response.data : user)));
+                // Log to confirm successful response
+                console.log("User updated successfully:", response.data);
+                
+                // Update the user in the local state
+                setUsers(prevUsers => 
+                    prevUsers.map(user => (user.id === userId ? { ...user, ...editData } : user))
+                );
+    
+                // Reset edit mode
                 setEditingUserId(null);
+                setEditData({});
+            } else {
+                console.error("Unexpected response:", response);
             }
         } catch (error) {
             console.error("Error saving user:", error);
         }
     };
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEditData(prev => ({ ...prev, [name]: value }));
+        if (name in editData) {
+            setEditData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const goBack = () => {
