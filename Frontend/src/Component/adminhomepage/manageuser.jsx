@@ -146,10 +146,11 @@ function ManageUsers() {
                                 <tr>
                                     <th>ID</th>
                                     <th>IC</th>
-                                    <th>Images</th>
+                                    {/* <th>Images</th> */}
                                     <th>Location</th>
-                                    <th>Status</th>
                                     <th>Shop Address</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -169,7 +170,7 @@ function ManageUsers() {
                                                 user.ic
                                             )}
                                         </td>
-                                        <td>
+                                        {/* <td>
                                             {Array.isArray(user.images) && user.images.length > 0 ? (
                                                 user.images.map((image, index) => (
                                                     <img
@@ -182,7 +183,7 @@ function ManageUsers() {
                                                     />
                                                 ))
                                             ) : <span>No images</span>}
-                                        </td>
+                                        </td> */}
                                         <td>
                                             {editingUserId === user.id ? (
                                                 <>
@@ -203,6 +204,19 @@ function ManageUsers() {
                                                 `${user.selected_latitude}, ${user.selected_longitude}`
                                             )}
                                         </td>
+                                        
+                                        <td>
+                                            {editingUserId === user.id ? (
+                                                <input 
+                                                    type="text" 
+                                                    name="selected_address" 
+                                                    value={editData.selected_address} 
+                                                    onChange={handleChange} 
+                                                />
+                                            ) : (
+                                                user.selected_address
+                                            )}
+                                        </td>
                                         <td>
                                             {editingUserId === user.id ? (
                                                 <input 
@@ -219,12 +233,12 @@ function ManageUsers() {
                                             {editingUserId === user.id ? (
                                                 <input 
                                                     type="text" 
-                                                    name="selected_address" 
-                                                    value={editData.selected_address} 
+                                                    name="reason" 
+                                                    value={editData.reason} 
                                                     onChange={handleChange} 
                                                 />
                                             ) : (
-                                                user.selected_address
+                                                user.reason
                                             )}
                                         </td>
                                         <td>

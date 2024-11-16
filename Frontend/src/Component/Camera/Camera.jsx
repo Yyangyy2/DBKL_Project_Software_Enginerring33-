@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
@@ -172,6 +171,13 @@ const Camera = () => {
             // Save status to the database
             await saveStatusInDatabase(status);
 
+            // Determine reason based on matches
+            const reason = determineReason(locationMatch, faceMatch);
+            console.log("Determined Reason:", reason);
+
+            // Save reason to the database
+            await saveReasonInDatabase(reason);
+
             // Update UI status color
             if (status === 'GREEN') setStatusColor('green');
             else if (status === 'YELLOW') setStatusColor('yellow');
@@ -237,6 +243,48 @@ const Camera = () => {
         }
     };
     
+
+
+    const determineReason = (locationMatch, faceMatch) => {
+        if (locationMatch && faceMatch) {
+            return 'Both location and face match';
+        } else if (locationMatch) {
+            return 'Faces do not match';
+        } else if (faceMatch) {
+            return 'Locations do not match';
+        } else {
+            return 'Both location and face do not match';
+        }
+    };
+    
+    const saveReasonInDatabase = async (reason) => {
+        try {
+            const response = await fetch('http://localhost:8081/saveReason', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',  // Ensure the token is included in the request
+                body: JSON.stringify({ reason }),
+            });
+    
+            const result = await response.json();
+            console.log(result.message);
+        } catch (error) {
+            console.error('Error saving reason:', error);
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     const onLoad = (autocompleteInstance) => {
         setAutocomplete(autocompleteInstance);

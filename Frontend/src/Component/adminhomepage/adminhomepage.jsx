@@ -160,10 +160,11 @@ function AdminHomepage() {
                                 <tr>
                                     <th>ID</th>
                                     <th>IC</th>
-                                    <th>Images</th>
+                                    {/* <th>Images</th> */}
                                     <th>Location</th>
-                                    <th>Status</th>
                                     <th>Shop Address</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -171,7 +172,7 @@ function AdminHomepage() {
                                     <tr key={user.id}>
                                         <td>{user.id}</td>
                                         <td>{user.ic}</td>
-                                        <td>
+                                        {/* <td>
                                             {Array.isArray(user.images) && user.images.length > 0 ? (
                                                 user.images.map((image, index) => (
                                                     <img
@@ -184,10 +185,11 @@ function AdminHomepage() {
                                                     />
                                                 ))
                                             ) : <span>No images</span>}
-                                        </td>
+                                        </td> */}
                                         <td>{user.selected_latitude}, {user.selected_longitude}</td>
-                                        <td>{user.status}</td>
                                         <td>{user.selected_address}</td>
+                                        <td>{user.status}</td>
+                                        <td>{user.reason}</td>
                                     </tr>
                                 ))}
                             </tbody>
