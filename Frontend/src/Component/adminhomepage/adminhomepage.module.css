@@ -1,11 +1,10 @@
+
 .container {
     background-image: url(https://images3.alphacoders.com/102/1021879.jpg);    
     padding: 20px;
     font-family: 'Arial', sans-serif;
     background-color: #f4f7fa;
 }
-
-
 
 .header {
     display: flex;
@@ -50,40 +49,42 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Adjust actions section */
 .actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
 }
 
 .actionButton {
-    flex: 1;
+    flex: 1 1 calc(33.333% - 20px);
     background-color: #007bff;
     color: #fff;
-    padding: 10px 15px;
+    padding: 15px;
     border-radius: 8px;
     text-align: center;
     font-size: 16px;
     transition: background-color 0.3s;
     text-decoration: none;
     box-shadow: 0px 0px 10px #3498db;
-
 }
 
 .actionButton:hover {
-    background-color: rgba(52, 152, 219, .5);
-    color:rgba(0, 0, 0, .5);
+    background-color: rgba(52, 152, 219, 0.5);
+    color: rgba(0, 0, 0, 0.5);
     font-weight: 500;
-    transition: ease-in-out .3s
+    transition: ease-in-out 0.3s;
 }
 
 .userTable {
     width: 100%;
-    max-width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    overflow-x: auto;
 }
 
-.userTable th, .userTable td {
+.userTable th,
+.userTable td {
     padding: 10px;
     border: 1px solid #ddd;
     text-align: left;
@@ -103,8 +104,96 @@
     background-color: #b32a36;
 }
 
+/* Media Queries */
+
+/* Medium screens (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .header h1 {
+        font-size: 32px;
+    }
+
+    .button {
+        padding: 6px 12px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .actionButton {
+        flex: 1 1 calc(50% - 20px);
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .userTable th,
+    .userTable td {
+        padding: 8px;
+    }
+}
+
+/* Small screens (max-width: 768px) */
 @media (max-width: 768px) {
-    .userTableContainer {
-        max-height: 300px;
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .button {
+        align-self: stretch;
+        margin-bottom: 10px;
+    }
+
+    .card {
+        padding: 10px;
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .actionButton {
+        flex: none;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .userTable th,
+    .userTable td {
+        padding: 6px;
+        font-size: 14px;
+    }
+}
+
+/* Extra small screens (max-width: 480px) */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .button {
+        padding: 5px 8px;
+    }
+
+    .card {
+        padding: 8px;
+    }
+
+    .actionButton {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .userTable th,
+    .userTable td {
+        padding: 5px;
+        font-size: 12px;
     }
 }

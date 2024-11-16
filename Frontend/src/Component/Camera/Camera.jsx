@@ -395,7 +395,7 @@ const Camera = () => {
                     )}
     
                     <div className="compare-button-container">
-                        <button onClick={handleCompareFaces} className="camera-btn">Compare Faces</button>
+                        <button onClick={handleCompareFaces} className="camera-btn">Confirm</button>
                     </div>
                 </div>
             )}
