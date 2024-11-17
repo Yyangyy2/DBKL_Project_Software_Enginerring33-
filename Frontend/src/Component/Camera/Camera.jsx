@@ -404,27 +404,27 @@ const Camera = () => {
                 </div>
             )}
     
-            {/* Comparison Result */}
+            {/* Comparison Result
             {comparisonResult && (
                 <div className="comparison-result">
                     <h3>Comparison Result:</h3>
                     <p>{comparisonResult}</p>
                 </div>
-            )}
+            )} */}
 
-            {/* Status Indicator */}
+            {/* Status Indicator
             <div className="status-display">
                 <h3>Status:</h3>
                 <div className={`status-indicator ${statusColor}`}>
                     <p>{statusColor.toUpperCase()}</p>
                     </div>
-            </div>
+            </div> */}
 
-            <div style={{background: '#007bff', borderRadius: '10px',
+            {/* <div style={{background: '#007bff', borderRadius: '10px',
                  width: '170px', padding:'10px', position: 'fixed', bottom: '0', right:'0'
                  , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
                 <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Home</span></Link>
-            </div>
+            </div> */}
 
         </div>
     );
