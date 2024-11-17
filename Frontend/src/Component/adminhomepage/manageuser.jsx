@@ -54,6 +54,7 @@ function ManageUsers() {
             setEditData({
                 ic: user.ic,
                 status: user.status,
+                reason: user.reason,
                 selected_address: user.selected_address,
                 selected_latitude: user.selected_latitude,
                 selected_longitude: user.selected_longitude
@@ -86,11 +87,8 @@ function ManageUsers() {
                 setEditData({});
                 setShowEditConfirmation(false);
                 setUserToSave(null);
-    
-                setMessage('User information saved successfully!');
-                setTimeout(() => setMessage(''), 3000);
             } else {
-                console.error("Unexpected response:", response);
+                // Handle non-200 responses if necessary
             }
         } catch (error) {
             console.error("Error saving user:", error);

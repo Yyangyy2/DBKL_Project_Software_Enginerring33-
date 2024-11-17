@@ -1,4 +1,3 @@
-
 import express from 'express';
 import mysql from 'mysql';
 import cors from 'cors';
@@ -563,6 +562,7 @@ app.get('/users', (req, res) => {
 });
 
 
+
 //////////////////////////////// Delete user route
 
 
@@ -587,11 +587,11 @@ app.delete('/users/:id', (req, res) => {
 //////////////////////////////// Edit user route
 app.put('/users/:userId', (req, res) => {
     const userId = req.params.userId;
-    const { ic, status, selected_address, selected_latitude, selected_longitude } = req.body;
+    const { ic, status, reason, selected_address, selected_latitude, selected_longitude } = req.body;
 
     db.query(
-        `UPDATE users SET ic = ?, status = ?, selected_address = ?, selected_latitude = ?, selected_longitude = ? WHERE id = ?`, 
-        [ic, status, selected_address, selected_latitude, selected_longitude, userId],
+        `UPDATE users SET ic = ?, status = ?, reason = ?, selected_address = ?, selected_latitude = ?, selected_longitude = ? WHERE id = ?`, 
+        [ic, status, reason, selected_address, selected_latitude, selected_longitude, userId],
         (err, updateResult) => {
             if (err) {
                 console.error('Error updating user:', err);
