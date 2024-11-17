@@ -1,8 +1,7 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 
 const Camera = () => {
@@ -14,8 +13,10 @@ const Camera = () => {
     const [autocomplete, setAutocomplete] = useState(null);
     const [warningMessage, setWarningMessage] = useState('');
     const [statusColor, setStatusColor] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const startCamera = async () => {
@@ -133,6 +134,7 @@ const Camera = () => {
     };
     
     const handleCompareFaces = async () => {
+        setIsLoading(true);
         if (!imageDataUrl) {
             setComparisonResult('No image captured.');
             return;
@@ -172,10 +174,20 @@ const Camera = () => {
             // Save status to the database
             await saveStatusInDatabase(status);
 
+            // Determine reason based on matches
+            const reason = determineReason(locationMatch, faceMatch);
+            console.log("Determined Reason:", reason);
+
+            // Save reason to the database
+            await saveReasonInDatabase(reason);
+
             // Update UI status color
             if (status === 'GREEN') setStatusColor('green');
             else if (status === 'YELLOW') setStatusColor('yellow');
             else setStatusColor('red');
+
+            // Navigate to CompletePage
+            navigate('/completepage');
         } catch (error) {
             console.error('Error comparing faces:', error);
             setComparisonResult('Error comparing faces.');
@@ -237,6 +249,47 @@ const Camera = () => {
         }
     };
     
+
+    const determineReason = (locationMatch, faceMatch) => {
+        if (locationMatch && faceMatch) {
+            return 'Both location and face match';
+        } else if (locationMatch) {
+            return 'Faces do not match';
+        } else if (faceMatch) {
+            return 'Locations do not match';
+        } else {
+            return 'Both location and face do not match';
+        }
+    };
+    
+    const saveReasonInDatabase = async (reason) => {
+        try {
+            const response = await fetch('http://localhost:8081/saveReason', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',  // Ensure the token is included in the request
+                body: JSON.stringify({ reason }),
+            });
+    
+            const result = await response.json();
+            console.log(result.message);
+        } catch (error) {
+            console.error('Error saving reason:', error);
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     const onLoad = (autocompleteInstance) => {
         setAutocomplete(autocompleteInstance);
@@ -347,32 +400,40 @@ const Camera = () => {
                     )}
     
                     <div className="compare-button-container">
-                        <button onClick={handleCompareFaces} className="camera-btn">Compare Faces</button>
+                        <button
+                            onClick={handleCompareFaces}
+                            className="camera-btn"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Loading...' : 'Confirm'}
+                        </button>
                     </div>
                 </div>
             )}
     
-            {/* Comparison Result */}
+            {/* Comparison Result
             {comparisonResult && (
                 <div className="comparison-result">
                     <h3>Comparison Result:</h3>
                     <p>{comparisonResult}</p>
                 </div>
-            )}
+            )} */}
 
-            {/* Status Indicator */}
+            {/* Status Indicator
             <div className="status-display">
                 <h3>Status:</h3>
                 <div className={`status-indicator ${statusColor}`}>
                     <p>{statusColor.toUpperCase()}</p>
                     </div>
-            </div>
+            </div> */}
 
-            <div style={{background: '#007bff', borderRadius: '10px',
+            {/* <div style={{background: '#007bff', borderRadius: '10px',
                  width: '170px', padding:'10px', position: 'fixed', bottom: '0', right:'0'
                  , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
                 <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Home</span></Link>
-            </div>
+            </div> */}
+
+            {isLoading && <p>Loading...</p>}
 
         </div>
     );

@@ -61,12 +61,14 @@ function AdminHomepage() {
 
     // Function to determine marker icon based on user status
     const getMarkerIcon = (status) => {
+        var status = status.toLowerCase();
+        
         switch (status) {
-            case 'GREEN':
+            case 'green':
                 return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-            case 'YELLOW':
+            case 'yellow':
                 return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-            case 'RED':
+            case 'red':
                 return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             default:
                 return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
@@ -155,44 +157,50 @@ function AdminHomepage() {
                 <section className={styles.card}>
                     <h2>User Database</h2>
                     {users.length > 0 ? (
-                        <table className={styles.userTable}>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>IC</th>
-                                    <th>Images</th>
-                                    <th>Location</th>
-                                    <th>Status</th>
-                                    <th>Shop Address</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map(user => (
-                                    <tr key={user.id}>
-                                        <td>{user.id}</td>
-                                        <td>{user.ic}</td>
-                                        <td>
-                                            {Array.isArray(user.images) && user.images.length > 0 ? (
-                                                user.images.map((image, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={image}
-                                                        alt="User"
-                                                        width="40"
-                                                        height="40"
-                                                        style={{ marginRight: '5px', borderRadius: '8px' }}
-                                                    />
-                                                ))
-                                            ) : <span>No images</span>}
-                                        </td>
-                                        <td>{user.selected_latitude}, {user.selected_longitude}</td>
-                                        <td>{user.status}</td>
-                                        <td>{user.selected_address}</td>
+                        <div className={styles.tableContainer}>
+                            <table className={styles.userTable}>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>IC</th>
+                                        <th>Images</th>
+                                        <th>Location</th>
+                                        <th>Shop Address</th>
+                                        <th>Status</th>
+                                        <th>Reason</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : <p>No users found.</p>}
+                                </thead>
+                                <tbody>
+                                    {users.map((user) => (
+                                        <tr key={user.id}>
+                                            <td>{user.id}</td>
+                                            <td>{user.ic}</td>
+                                            <td>
+                                             {user.images ? (
+                                                <img
+                                                    src={`data:image/jpeg;base64,${user.images}`}
+                                                    alt="User"
+                                                    className={styles.userImage}
+                                                    loading="lazy" // Enables lazy loading
+                                                />
+                                             ) : (
+                                                <span>No images</span>
+                                             )}  
+                                            </td>
+                                            <td>
+                                                {user.selected_latitude}, {user.selected_longitude}
+                                            </td>
+                                            <td>{user.selected_address}</td>
+                                            <td>{user.status}</td>
+                                            <td>{user.reason}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <p>No users found.</p>
+                    )}
                 </section>
             </main>
         </div>

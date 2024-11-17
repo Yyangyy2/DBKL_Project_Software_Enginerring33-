@@ -1,3 +1,4 @@
+
 import './login.css';
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -182,10 +183,6 @@ function LoginPage() {
                         <button type="submit" className='btn'>
                             <span>Login</span>
                         </button>
-
-                        <span className='forgotPassword'>
-                            Forgot Your Password? <a href='#'>Click Here</a>
-                        </span>
 
                         <div className="footerDiv">
                             <span>Don't have an account?</span>

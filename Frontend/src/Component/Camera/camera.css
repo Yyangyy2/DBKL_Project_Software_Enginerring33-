@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Contrail+One&family=Poppins:wght@400;500;600&display=swap');
 
 .camera-container {
-    background-image: url(https://images5.alphacoders.com/385/385448.jpg);    
+    background-image: url(https://images3.alphacoders.com/102/1021879.jpg);    
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -14,7 +14,7 @@
 
 h2 {
     font-weight: 500;
-    color: #333;
+    color: #fff;
     margin-bottom: 10px;
 }
 
