@@ -155,45 +155,47 @@ function AdminHomepage() {
                 <section className={styles.card}>
                     <h2>User Database</h2>
                     {users.length > 0 ? (
-                        <table className={styles.userTable}>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>IC</th>
-                                    <th>Images</th>
-                                    <th>Location</th>
-                                    <th>Shop Address</th>
-                                    <th>Status</th>
-                                    <th>Reason</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map((user) => (
-                                    <tr key={user.id}>
-                                        <td>{user.id}</td>
-                                        <td>{user.ic}</td>
-                                        <td>
-                                         {user.images ? (
-                                            <img
-                                                src={`data:image/jpeg;base64,${user.images}`}
-                                                alt="User"
-                                                className={styles.userImage}
-                                                loading="lazy" // Enables lazy loading
-                                            />
-                                         ) : (
-                                            <span>No images</span>
-                                         )}  
-                                        </td>
-                                        <td>
-                                            {user.selected_latitude}, {user.selected_longitude}
-                                        </td>
-                                        <td>{user.selected_address}</td>
-                                        <td>{user.status}</td>
-                                        <td>{user.reason}</td>
+                        <div className={styles.tableContainer}>
+                            <table className={styles.userTable}>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>IC</th>
+                                        <th>Images</th>
+                                        <th>Location</th>
+                                        <th>Shop Address</th>
+                                        <th>Status</th>
+                                        <th>Reason</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {users.map((user) => (
+                                        <tr key={user.id}>
+                                            <td>{user.id}</td>
+                                            <td>{user.ic}</td>
+                                            <td>
+                                             {user.images ? (
+                                                <img
+                                                    src={`data:image/jpeg;base64,${user.images}`}
+                                                    alt="User"
+                                                    className={styles.userImage}
+                                                    loading="lazy" // Enables lazy loading
+                                                />
+                                             ) : (
+                                                <span>No images</span>
+                                             )}  
+                                            </td>
+                                            <td>
+                                                {user.selected_latitude}, {user.selected_longitude}
+                                            </td>
+                                            <td>{user.selected_address}</td>
+                                            <td>{user.status}</td>
+                                            <td>{user.reason}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     ) : (
                         <p>No users found.</p>
                     )}
