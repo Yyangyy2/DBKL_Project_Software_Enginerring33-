@@ -1,10 +1,11 @@
-/* Base styles */
 
 .container {
-    background-image: url(https://images3.alphacoders.com/102/1021879.jpg);    
+    background-image: url('https://images3.alphacoders.com/102/1021879.jpg');    
     padding: 20px;
     font-family: Arial, sans-serif;
-    background-color: #f4f7fa;
+    background-color: rgba(244, 247, 250, 0.9); /* Added transparency for better text visibility */
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 .header {
@@ -12,11 +13,13 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .header h1 {
     font-size: 40px;
-    color: #fff;
+    color: #333; /* Changed to dark color for readability */
+    margin-bottom: 10px;
 }
 
 .card {
@@ -26,27 +29,31 @@
     padding: 20px;
     margin: 0 auto;
     max-width: 100%;
-    overflow: auto;
+    overflow-x: auto;
 }
 
 .userTableContainer {
     width: 100%;
     max-width: 100%;
     border-radius: 8px;
+    overflow-x: auto;
 }
 
 .searchBar {
     width: 100%;
+    max-width: 300px;
     padding: 10px;
     margin: 10px 0;
     border-radius: 8px;
     border: 1px solid #ddd;
+    box-sizing: border-box;
 }
 
 .userTable {
     width: 100%;
     max-width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 .userTable th,
@@ -54,6 +61,7 @@
     padding: 10px;
     border: 1px solid #ddd;
     text-align: left;
+    vertical-align: middle;
 }
 
 .userTable th {
@@ -68,8 +76,9 @@
 
 .userTable img {
     border-radius: 8px;
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
 }
 
 .button {
@@ -80,6 +89,8 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-right: 5px;
+    font-size: 14px;
 }
 
 .button:hover {
@@ -91,15 +102,28 @@
     color: white;
 }
 
+.saveButton:hover {
+    background-color: #45a049;
+}
+
 .cancelButton,
 .deleteButton {
     background-color: #f44336;
     color: white;
 }
 
+.cancelButton:hover,
+.deleteButton:hover {
+    background-color: #da190b;
+}
+
 .editButton {
     background-color: #2196F3;
     color: white;
+}
+
+.editButton:hover {
+    background-color: #0b7dda;
 }
 
 .backButton {
@@ -115,6 +139,14 @@
 
 .backButton:hover {
     background-color: #555;
+}
+
+.inputField {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 /* Modal styling */
@@ -169,6 +201,11 @@
     .card {
         padding: 25px;
     }
+
+    .userTable img {
+        width: 80px;
+        height: 80px;
+    }
 }
 
 /* Medium screens (max-width: 1024px) */
@@ -190,6 +227,11 @@
     .userTable td {
         padding: 10px;
         font-size: 14px;
+    }
+
+    .userTable img {
+        width: 60px;
+        height: 60px;
     }
 }
 
@@ -225,6 +267,16 @@
     .searchBar {
         padding: 8px;
         font-size: 14px;
+        max-width: 100%;
+    }
+
+    .userTable img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .inputField {
+        font-size: 12px;
     }
 }
 
@@ -254,6 +306,15 @@
         font-size: 12px;
     }
 
+    .userTable img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .inputField {
+        font-size: 10px;
+    }
+
     .modalContent {
         padding: 15px;
     }
@@ -261,5 +322,13 @@
     .modalButtons {
         flex-direction: column;
         gap: 5px;
+    }
+
+    .header {
+        align-items: center;
+    }
+
+    .searchBar {
+        margin-top: 10px;
     }
 }

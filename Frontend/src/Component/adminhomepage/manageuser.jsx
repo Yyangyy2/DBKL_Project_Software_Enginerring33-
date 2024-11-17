@@ -146,7 +146,7 @@ function ManageUsers() {
                                 <tr>
                                     <th>ID</th>
                                     <th>IC</th>
-                                    {/* <th>Images</th> */}
+                                    <th>Images</th>
                                     <th>Location</th>
                                     <th>Shop Address</th>
                                     <th>Status</th>
@@ -170,20 +170,19 @@ function ManageUsers() {
                                                 user.ic
                                             )}
                                         </td>
-                                        {/* <td>
-                                            {Array.isArray(user.images) && user.images.length > 0 ? (
-                                                user.images.map((image, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={image}
-                                                        alt="User"
-                                                        width="40"
-                                                        height="40"
-                                                        style={{ marginRight: '5px', borderRadius: '8px' }}
-                                                    />
-                                                ))
-                                            ) : <span>No images</span>}
-                                        </td> */}
+                                        <td>
+                                            {user.images ? (
+                                                <img
+                                                    src={`data:image/jpeg;base64,${user.images}`}
+                                                    alt="User"
+                                                    width="180"
+                                                    height="180"
+                                                    style={{ marginRight: '15px', borderRadius: '18px' }}
+                                                />
+                                            ) : (
+                                                <span>No images</span>
+                                            )}
+                                        </td>
                                         <td>
                                             {editingUserId === user.id ? (
                                                 <>

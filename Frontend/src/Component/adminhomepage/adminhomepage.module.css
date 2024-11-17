@@ -1,31 +1,46 @@
 
+/* Container Styles */
 .container {
-    background-image: url(https://images3.alphacoders.com/102/1021879.jpg);    
+    background-image: url('https://images3.alphacoders.com/102/1021879.jpg');
+    background-size: cover;
+    background-position: center;
     padding: 20px;
     font-family: 'Arial', sans-serif;
-    background-color: #f4f7fa;
+    background-color: rgba(244, 247, 250, 0.8); /* Semi-transparent overlay for readability */
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* Header Styles */
 .header {
+    width: 100%;
+    max-width: 1200px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
 
 .header h1 {
-    font-size: 40px;
-    color: #fff;
+    font-size: 36px;
+    color: #ffffff; /* Ensures visibility against background */
+    margin: 10px 0;
 }
 
 .button {
     background-color: #007bff;
     color: #fff;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 16px;
+    margin: 5px 0;
 }
 
 .button:hover {
@@ -36,24 +51,84 @@
     background-color: #ff5c5c;
 }
 
+.logoutButton:hover {
+    background-color: #e04848;
+}
+
+/* Main Content Styles */
 .main {
+    width: 100%;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    align-items: center;
+    padding: 0 10px;
 }
 
 .card {
+    width: 100%;
     background-color: #ffffff;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-/* Adjust actions section */
+.card h2 {
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Table Container */
+.tableContainer {
+    width: 100%;
+    overflow-x: auto; /* Enables horizontal scrolling on small devices */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* User Table Styles */
+.userTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Ensures table is wide enough on larger screens */
+}
+
+.userTable th,
+.userTable td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.userTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+/* Responsive Image Styling */
+.userImage {
+    width: 100%;
+    max-width: 80px;
+    height: auto;
+    border-radius: 18px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.userImage:hover {
+    transform: scale(1.05);
+}
+
+/* Actions Section */
 .actions {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-top: 20px;
 }
 
 .actionButton {
@@ -64,47 +139,49 @@
     border-radius: 8px;
     text-align: center;
     font-size: 16px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
     text-decoration: none;
-    box-shadow: 0px 0px 10px #3498db;
+    box-shadow: 0px 0px 10px rgba(52, 152, 219, 0.5);
 }
 
 .actionButton:hover {
-    background-color: rgba(52, 152, 219, 0.5);
-    color: rgba(0, 0, 0, 0.5);
-    font-weight: 500;
-    transition: ease-in-out 0.3s;
+    background-color: rgba(52, 152, 219, 0.7);
+    transform: translateY(-2px);
 }
 
-.userTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    overflow-x: auto;
-}
+/* Responsive Adjustments */
 
-.userTable th,
-.userTable td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
+/* Large screens (min-width: 1201px) */
+@media (min-width: 1201px) {
+    .header h1 {
+        font-size: 42px;
+    }
 
-.userTable th {
-    background-color: #f9f9f9;
-    font-weight: bold;
-    font-size: 14px;
-}
+    .button {
+        padding: 12px 25px;
+        font-size: 18px;
+    }
 
-.deleteButton {
-    background-color: #dc3545;
-}
+    .logoutButton {
+        padding: 12px 25px;
+        font-size: 18px;
+    }
 
-.deleteButton:hover {
-    background-color: #b32a36;
-}
+    .actionButton {
+        padding: 18px;
+        font-size: 18px;
+    }
 
-/* Media Queries */
+    .userImage {
+        max-width: 100px;
+    }
+
+    .userTable th,
+    .userTable td {
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+}
 
 /* Medium screens (max-width: 1024px) */
 @media (max-width: 1024px) {
@@ -113,22 +190,28 @@
     }
 
     .button {
-        padding: 6px 12px;
+        padding: 10px 20px;
+        font-size: 16px;
     }
 
-    .card {
-        padding: 15px;
+    .logoutButton {
+        padding: 10px 20px;
+        font-size: 16px;
     }
 
     .actionButton {
-        flex: 1 1 calc(50% - 20px);
-        font-size: 14px;
-        padding: 12px;
+        padding: 15px;
+        font-size: 16px;
+    }
+
+    .userImage {
+        max-width: 70px;
     }
 
     .userTable th,
     .userTable td {
-        padding: 8px;
+        padding: 12px 15px;
+        font-size: 14px;
     }
 }
 
@@ -136,21 +219,23 @@
 @media (max-width: 768px) {
     .header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        text-align: center;
     }
 
     .header h1 {
         font-size: 28px;
-        margin-bottom: 10px;
     }
 
-    .button {
-        align-self: stretch;
-        margin-bottom: 10px;
+    .button,
+    .logoutButton {
+        width: 100%;
+        padding: 8px 16px;
+        font-size: 14px;
     }
 
     .card {
-        padding: 10px;
+        padding: 15px;
     }
 
     .actions {
@@ -159,16 +244,19 @@
     }
 
     .actionButton {
-        flex: none;
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
+        flex: 1 1 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .userImage {
+        max-width: 60px;
     }
 
     .userTable th,
     .userTable td {
-        padding: 6px;
-        font-size: 14px;
+        padding: 10px 12px;
+        font-size: 13px;
     }
 }
 
@@ -178,22 +266,37 @@
         font-size: 24px;
     }
 
-    .button {
-        padding: 5px 8px;
+    .button,
+    .logoutButton {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 
     .card {
-        padding: 8px;
+        padding: 10px;
     }
 
     .actionButton {
-        padding: 8px;
-        font-size: 14px;
+        flex: 1 1 100%;
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .userImage {
+        max-width: 50px;
     }
 
     .userTable th,
     .userTable td {
-        padding: 5px;
+        padding: 8px 10px;
         font-size: 12px;
     }
+}
+
+.deleteButton {
+    background-color: #dc3545;
+}
+
+.deleteButton:hover {
+    background-color: #b32a36;
 }

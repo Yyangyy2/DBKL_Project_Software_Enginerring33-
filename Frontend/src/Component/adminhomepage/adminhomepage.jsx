@@ -160,7 +160,7 @@ function AdminHomepage() {
                                 <tr>
                                     <th>ID</th>
                                     <th>IC</th>
-                                    {/* <th>Images</th> */}
+                                    <th>Images</th>
                                     <th>Location</th>
                                     <th>Shop Address</th>
                                     <th>Status</th>
@@ -168,25 +168,25 @@ function AdminHomepage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.map(user => (
+                                {users.map((user) => (
                                     <tr key={user.id}>
                                         <td>{user.id}</td>
                                         <td>{user.ic}</td>
-                                        {/* <td>
-                                            {Array.isArray(user.images) && user.images.length > 0 ? (
-                                                user.images.map((image, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={image}
-                                                        alt="User"
-                                                        width="40"
-                                                        height="40"
-                                                        style={{ marginRight: '5px', borderRadius: '8px' }}
-                                                    />
-                                                ))
-                                            ) : <span>No images</span>}
-                                        </td> */}
-                                        <td>{user.selected_latitude}, {user.selected_longitude}</td>
+                                        <td>
+                                         {user.images ? (
+                                            <img
+                                                src={`data:image/jpeg;base64,${user.images}`}
+                                                alt="User"
+                                                className={styles.userImage}
+                                                loading="lazy" // Enables lazy loading
+                                            />
+                                         ) : (
+                                            <span>No images</span>
+                                         )}  
+                                        </td>
+                                        <td>
+                                            {user.selected_latitude}, {user.selected_longitude}
+                                        </td>
                                         <td>{user.selected_address}</td>
                                         <td>{user.status}</td>
                                         <td>{user.reason}</td>
@@ -194,7 +194,9 @@ function AdminHomepage() {
                                 ))}
                             </tbody>
                         </table>
-                    ) : <p>No users found.</p>}
+                    ) : (
+                        <p>No users found.</p>
+                    )}
                 </section>
             </main>
         </div>
