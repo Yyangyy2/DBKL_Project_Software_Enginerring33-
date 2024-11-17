@@ -13,6 +13,7 @@ const Camera = () => {
     const [autocomplete, setAutocomplete] = useState(null);
     const [warningMessage, setWarningMessage] = useState('');
     const [statusColor, setStatusColor] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const navigate = useNavigate();
@@ -133,6 +134,7 @@ const Camera = () => {
     };
     
     const handleCompareFaces = async () => {
+        setIsLoading(true);
         if (!imageDataUrl) {
             setComparisonResult('No image captured.');
             return;
@@ -399,7 +401,13 @@ const Camera = () => {
                     )}
     
                     <div className="compare-button-container">
-                        <button onClick={handleCompareFaces} className="camera-btn">Confirm</button>
+                        <button
+                            onClick={handleCompareFaces}
+                            className="camera-btn"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Loading...' : 'Confirm'}
+                        </button>
                     </div>
                 </div>
             )}
@@ -425,6 +433,8 @@ const Camera = () => {
                  , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
                 <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Home</span></Link>
             </div> */}
+
+            {isLoading && <p>Loading...</p>}
 
         </div>
     );
