@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 
 const Camera = () => {
@@ -15,6 +15,7 @@ const Camera = () => {
     const [statusColor, setStatusColor] = useState('');
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const startCamera = async () => {
@@ -182,6 +183,9 @@ const Camera = () => {
             if (status === 'GREEN') setStatusColor('green');
             else if (status === 'YELLOW') setStatusColor('yellow');
             else setStatusColor('red');
+
+            // Navigate to CompletePage
+            navigate('/completepage');
         } catch (error) {
             console.error('Error comparing faces:', error);
             setComparisonResult('Error comparing faces.');
