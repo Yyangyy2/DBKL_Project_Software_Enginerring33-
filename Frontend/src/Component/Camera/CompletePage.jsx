@@ -1,13 +1,24 @@
 import React from 'react';
 import './CompletePage.css';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CompletePage = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post('http://localhost:8081/logout', {}, { withCredentials: true });
+  
+      if (response.status === 200) {
+        console.log(response.data.message); 
+        navigate('/login'); // Redirect to the login page
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
