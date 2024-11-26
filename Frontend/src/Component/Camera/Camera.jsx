@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
 import './camera.css';
-<<<<<<<<< Temporary merge branch 1
-=========
-import {Link} from 'react-router-dom';
->>>>>>>>> Temporary merge branch 2
+import {Link, useNavigate} from 'react-router-dom';
+
 
 const Camera = () => {
     const [imageDataUrl, setImageDataUrl] = useState('');
@@ -429,15 +427,14 @@ const Camera = () => {
                     </div>
             </div> */}
 
-<<<<<<<<< Temporary merge branch 1
-=========
-            <div style={{background: '#007bff', borderRadius: '10px',
+            {/* <div style={{background: '#007bff', borderRadius: '10px',
                  width: '170px', padding:'10px', position: 'fixed', bottom: '0', right:'0'
                  , margin: '0 50px 30px 0px', cursor: 'pointer' }}>
-                <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Homepage</span></Link>
-            </div>
+                <Link to="/homepage"><span style={{fontWeight: '600', color: '#fff'}}>Home</span></Link>
+            </div> */}
 
->>>>>>>>> Temporary merge branch 2
+            {isLoading && <p>Loading...</p>}
+
         </div>
     );
 };
