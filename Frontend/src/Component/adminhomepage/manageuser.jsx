@@ -54,6 +54,7 @@ function ManageUsers() {
             setEditData({
                 ic: user.ic,
                 status: user.status,
+                reason: user.reason,
                 selected_address: user.selected_address,
                 selected_latitude: user.selected_latitude,
                 selected_longitude: user.selected_longitude
@@ -86,11 +87,8 @@ function ManageUsers() {
                 setEditData({});
                 setShowEditConfirmation(false);
                 setUserToSave(null);
-    
-                setMessage('User information saved successfully!');
-                setTimeout(() => setMessage(''), 3000);
             } else {
-                console.error("Unexpected response:", response);
+                // Handle non-200 responses if necessary
             }
         } catch (error) {
             console.error("Error saving user:", error);
@@ -119,10 +117,10 @@ function ManageUsers() {
     };
 
     const filteredUsers = users.filter(user =>
-        user.ic.toLowerCase().includes(search.toLowerCase()) ||
-        user.status.toLowerCase().includes(search.toLowerCase())
+        (user.ic && user.ic.toLowerCase().includes(search.toLowerCase())) ||
+        (user.status && user.status.toLowerCase().includes(search.toLowerCase()))
     );
-
+    
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -148,8 +146,9 @@ function ManageUsers() {
                                     <th>IC</th>
                                     <th>Images</th>
                                     <th>Location</th>
-                                    <th>Status</th>
                                     <th>Shop Address</th>
+                                    <th>Status</th>
+                                    <th>Reason</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -170,18 +169,17 @@ function ManageUsers() {
                                             )}
                                         </td>
                                         <td>
-                                            {Array.isArray(user.images) && user.images.length > 0 ? (
-                                                user.images.map((image, index) => (
-                                                    <img
-                                                        key={index}
-                                                        src={image}
-                                                        alt="User"
-                                                        width="40"
-                                                        height="40"
-                                                        style={{ marginRight: '5px', borderRadius: '8px' }}
-                                                    />
-                                                ))
-                                            ) : <span>No images</span>}
+                                            {user.images ? (
+                                                <img
+                                                    src={`data:image/jpeg;base64,${user.images}`}
+                                                    alt="User"
+                                                    width="180"
+                                                    height="180"
+                                                    style={{ marginRight: '15px', borderRadius: '18px' }}
+                                                />
+                                            ) : (
+                                                <span>No images</span>
+                                            )}
                                         </td>
                                         <td>
                                             {editingUserId === user.id ? (
@@ -203,6 +201,19 @@ function ManageUsers() {
                                                 `${user.selected_latitude}, ${user.selected_longitude}`
                                             )}
                                         </td>
+                                        
+                                        <td>
+                                            {editingUserId === user.id ? (
+                                                <input 
+                                                    type="text" 
+                                                    name="selected_address" 
+                                                    value={editData.selected_address} 
+                                                    onChange={handleChange} 
+                                                />
+                                            ) : (
+                                                user.selected_address
+                                            )}
+                                        </td>
                                         <td>
                                             {editingUserId === user.id ? (
                                                 <input 
@@ -219,15 +230,15 @@ function ManageUsers() {
                                             {editingUserId === user.id ? (
                                                 <input 
                                                     type="text" 
-                                                    name="selected_address" 
-                                                    value={editData.selected_address} 
+                                                    name="reason" 
+                                                    value={editData.reason} 
                                                     onChange={handleChange} 
                                                 />
                                             ) : (
-                                                user.selected_address
+                                                user.reason
                                             )}
                                         </td>
-                                        <td>
+                                        <td className={`${styles.btnContainer}`}>
                                             {editingUserId === user.id ? (
                                                 <>
                                                     <button onClick={() => confirmSaveUser(user.id)} className={`${styles.button} ${styles.saveButton}`}>Save</button>

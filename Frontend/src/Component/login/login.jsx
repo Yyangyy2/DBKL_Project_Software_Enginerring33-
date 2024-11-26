@@ -1,3 +1,4 @@
+
 import './login.css';
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -176,16 +177,12 @@ function LoginPage() {
                                 </div>
                             </div>
 
-                            {loginStatus && <span className="status">{loginStatus}</span>}
-                        </div>
-
-                        <button type="submit" className='btn'>
-                            <span>Login</span>
-                        </button>
-
-                        <span className='forgotPassword'>
-                            Forgot Your Password? <a href='#'>Click Here</a>
-                        </span>
+                        {loginStatus && <span className="status">{loginStatus}</span>}
+                    </div>
+                   
+                    <button type="submit" className='btn'>
+                        <span>Login</span>
+                    </button>
 
                         <div className="footerDiv">
                             <span>Don't have an account?</span>

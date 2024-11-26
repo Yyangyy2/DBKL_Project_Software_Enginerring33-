@@ -7,12 +7,14 @@ function MarkerComponent({ user }) {
 
     // Function to determine marker color based on user status
     const getMarkerColor = (status) => {
+        var status = status.toLowerCase();
+        
         switch (status) {
-            case 'GREEN':
+            case 'green':
                 return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-            case 'YELLOW':
+            case 'yellow':
                 return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-            case 'RED':
+            case 'red':
                 return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
             default:
                 return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';

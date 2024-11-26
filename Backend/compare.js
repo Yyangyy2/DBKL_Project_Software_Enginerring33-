@@ -283,6 +283,9 @@ app.post('/register', async (req, res) => {
 });
 
 
+
+
+
 /////////////////////////////////////////////////////////////logout//////////////////////////////////////////////////
 app.post('/logout',(req, res) =>{
     // Clear the JWT cookie by setting it to an expired date
@@ -555,7 +558,9 @@ app.post('/saveLocation', verifyToken, async (req, res) => {
     }
 });
 
-///////////////////////////////////////////////////////////////////////Endpoint to save status in the users table///////////////////////////////////
+
+
+///////////////////////////////////////Endpoint to save status in the users table///////////////////////////////////
 app.post('/saveStatus', verifyToken, async (req, res) => {
     const { status } = req.body;
     const userId = req.user.id;  // userId is obtained from the token
@@ -581,36 +586,6 @@ app.post('/saveStatus', verifyToken, async (req, res) => {
     }
 });
 
-
-
-///////////////////////////////////////////////////// Endpoint to save reason in the users table////////////////////////////////
-app.post('/saveReason', verifyToken, async (req, res) => {
-    const { reason } = req.body;
-    const userId = req.user.id;  // userId is obtained from the token
-
-    if (!reason) {
-        return res.status(400).json({ message: 'Reason is required' });
-    }
-
-    const query = `UPDATE users SET reason = ? WHERE id = ?`;
-
-    try {
-        await new Promise((resolve, reject) => {
-            db.query(query, [reason, userId], (err, results) => {
-                if (err) return reject(err);
-                resolve(results);
-            });
-        });
-
-        res.status(200).json({ message: 'Reason updated successfully' });
-    } catch (error) {
-        console.error('Error updating reason:', error.message || error);
-        res.status(500).json({ message: 'Error updating reason' });
-    }
-});
-
-
-
     
 /////////////////////////////////////RETRIVE USERS DATABASE INTO ADMIN//////////////////////////////////
 
@@ -629,7 +604,9 @@ app.get('/users', (req, res) => {
 });
 
 
-//////////////////////////////////////////////////////////////////Delete user route////////////////////////////////////////////////////////////
+//////////////////////////////
+
+// Delete user route
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
     const deleteQuery = 'DELETE FROM users WHERE id = ?';
@@ -647,40 +624,6 @@ app.delete('/users/:id', (req, res) => {
         res.json({ message: 'User deleted successfully' });
     });
 });
-
-
-
-
-
-////////////////////////////////////////////////////////////Edit users information////////////////////////////////////
-app.put('/users/:userId', (req, res) => {
-    const userId = req.params.userId;
-    const { ic, status, reason, selected_address, selected_latitude, selected_longitude } = req.body;
-
-    db.query(
-        `UPDATE users SET ic = ?, status = ?, reason = ?, selected_address = ?, selected_latitude = ?, selected_longitude = ? WHERE id = ?`, 
-        [ic, status, reason, selected_address, selected_latitude, selected_longitude, userId],
-        (err, updateResult) => {
-            if (err) {
-                console.error('Error updating user:', err);
-                return res.status(500).json({ error: 'Failed to update user' });
-            }
-
-            db.query(`SELECT * FROM users WHERE id = ?`, [userId], (err, results) => {
-                if (err) {
-                    console.error('Error retrieving updated user:', err);
-                    return res.status(500).json({ error: 'Failed to retrieve updated user' });
-                }
-                if (results.length === 0) {
-                    return res.status(404).json({ error: 'User not found' });
-                }
-                const updatedUser = results[0];
-                res.status(200).json(updatedUser);
-            });
-        }
-    );
-});
-
 
 // Start the server
 const PORT = 8081;

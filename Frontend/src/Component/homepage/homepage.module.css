@@ -6,7 +6,7 @@
 }
 
 body{
-    background-image: url(https://images5.alphacoders.com/385/385448.jpg);   
+    background-image: url(https://images3.alphacoders.com/102/1021879.jpg);   
     width: 100vw;
     height: 100vh;
     overflow: hidden;
@@ -174,6 +174,9 @@ body{
     color: #000;
 }
 
+.remaining_attempts{
+    color: rgb(255, 0, 0)
+}
 
 .text_muted{
     color: #000;
@@ -244,6 +247,12 @@ h3{
     color:rgba(0, 0, 0, .5);
     font-weight: 500;
     transition: ease-in-out .3s
+}
+.btn_primary:disabled {
+    background-color: #ccc; /* Gray or any other color you prefer */
+    color: #666; /* Darker text color for contrast */
+    cursor: not-allowed; /* Shows that the button is disabled */
+    opacity: 0.6; /* Optional: make it slightly transparent */
 }
 
 /* Center container */
